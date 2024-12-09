@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text detector with Effects</title>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@latest/dist/tesseract.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    #image-container {
+      position: relative;
+      display: inline-block;
+    }
+    .word-box {
+      position: absolute;
+      border: 2px solid red;
+      cursor: pointer;
+    }
+    .word-box.selected {
+      border-color: green;
+    }
+    #effectsPanel {
+      position: fixed;
+      bottom: 60px;
+      right: 10px;
+      background: white;
+      padding: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    #actionBar {
+      position: fixed;
+      bottom: 0;
+      left: 15%;
+      width: 80%;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 25px;
+      padding: 1rem;
+      display: flex;
+      Gap:5px;
+      justify-content: space-around;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    #actionBar button {
+      width: auto;
+      flex-shrink: 0;
+    }
+    .repoCard {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+    .repoCard:hover {
+      transform: translateY(-5px);
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow fixed w-full top-0 z-50">
+    <div class="container mx-auto px-4 py-2 flex items-center justify-between">
+      <h1 class="text-xl font-bold text-gray-800">Image Editor</h1>
+      <div class="relative">
+        <select id="tabSelector" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+          <option value="tab-extracted-data">Extracted Data</option>
+          <option value="tab-edit" selected>Edit</option>
+          <option value="tab-other-tools">Other Tools</option>
+        </select>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <div class="mt-16 container mx-auto px-4">
+    <!-- Extracted Data Tab -->
+    <div id="tab-extracted-data" class="hidden">
+      <h2 class="text-2xl font-semibold mb-4">Extracted Data</h2>
+      <table class="table-auto w-full bg-white shadow rounded">
+        <thead class="bg-gray-200">
+          <tr>
+            <th class="px-4 py-2">Word</th>
+            <th class="px-4 py-2">Confidence</th>
+          </tr>
+        </thead>
+        <tbody id="extractedDataTable"></tbody>
+      </table>
+    </div>
+
+    <!-- Edit Tab -->
+    <div id="tab-edit" class="block">
+      <h2 class="text-2xl font-semibold mb-4">upload => Detect text => Effects => Download</h2>
+      <div class="mb-4">
+        <input type="file" id="imageInput" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+      </div>
+      <div id="image-container">
+        <canvas id="imageCanvas" class="shadow border"></canvas>
+      </div>
+      
+      <!-- Effects Panel -->
+      <div id="effectsPanel" class="hidden">
+        <h3 class="text-lg font-semibold mb-2">Effects Panel</h3>
+        <div class="space-y-2">
+          <button id="applyBlur" class="block w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Apply Blur</button>
+          <button id="applyGrayscale" class="block w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">Apply Grayscale</button>
+          <button id="applyBrightness" class="block w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600">Increase Brightness</button>
+        </div>
+        <button id="closePanel" class="mt-4 block w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Close Panel</button>
+      </div>
+
+      <!-- Action Bar -->
+      <div id="actionBar" class="hidden">
+        <button id="undoBtn" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Undo</button>
+        <button id="forwardBtn" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Forward</button>
+        <button id="resetBtn" class="bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600">Reset</button>
+        <button id="downloadBtn" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Download</button>
+      </div>
+    </div>
+
+    <!-- Other Tools Tab -->
+    <div id="tab-other-tools" class="hidden">
+      <h2 class="text-2xl font-semibold mb-4">Other Tools</h2>
+      <div class="flex flex-wrap" id="repoList"></div>
+    </div>
+  </div>
+
+  <script>
+    const tabSelector = document.getElementById('tabSelector');
+    const extractedDataTab = document.getElementById('tab-extracted-data');
+    const editTab = document.getElementById('tab-edit');
+    const otherToolsTab = document.getElementById('tab-other-tools');
+    const imageInput = document.getElementById('imageInput');
+    const imageCanvas = document.getElementById('imageCanvas');
+    const ctx = imageCanvas.getContext('2d');
+    const imageContainer = document.getElementById('image-container');
+    const effectsPanel = document.getElementById('effectsPanel');
+    const actionBar = document.getElementById('actionBar');
+    const applyBlur = document.getElementById('applyBlur');
+    const applyGrayscale = document.getElementById('applyGrayscale');
+    const applyBrightness = document.getElementById('applyBrightness');
+    const closePanel = document.getElementById('closePanel');
+    const undoBtn = document.getElementById('undoBtn');
+    const forwardBtn = document.getElementById('forwardBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const repoList = document.getElementById('repoList');
+
+    let uploadedImage = null;
+    let selectedBoxes = [];
+    let history = [];
+    let currentHistoryIndex = -1;
+
+    // Tab Switching Logic
+    tabSelector.addEventListener('change', () => {
+      const selectedTab = tabSelector.value;
+      if (selectedTab === 'tab-extracted-data') {
+        extractedDataTab.classList.remove('hidden');
+        editTab.classList.add('hidden');
+        otherToolsTab.classList.add('hidden');
+        effectsPanel.classList.add('hidden');
+        actionBar.classList.add('hidden');
+      } else if (selectedTab === 'tab-edit') {
+        extractedDataTab.classList.add('hidden');
+        editTab.classList.remove('hidden');
+        otherToolsTab.classList.add('hidden');
+        effectsPanel.classList.remove('hidden');
+        actionBar.classList.remove('hidden');
+      } else {
+        extractedDataTab.classList.add('hidden');
+        editTab.classList.add('hidden');
+        otherToolsTab.classList.remove('hidden');
+        effectsPanel.classList.add('hidden');
+        actionBar.classList.add('hidden');
+        fetchGitHubRepos();
+      }
+    });
+
+    // Fetch GitHub Repositories
+    function fetchGitHubRepos() {
+      const currentPageLocation = window.location.href;
+      let displayedRepos = 0;
+
+      fetch('https://api.github.com/users/hoodaatwa/repos')
+        .then(response => response.json())
+        .then(data => {
+          const currentRepoTopics = data
+            .filter(repo => repo.homepage === currentPageLocation)
+            .flatMap(repo => repo.topics || []);
+
+          data.forEach(repo => {
+            const repoTopics = repo.topics || [];
+            if (displayedRepos >= 4 || repo.homepage === currentPageLocation || !repoTopics.some(topic => currentRepoTopics.includes(topic))) {
+              return;
+            }
+
+            const repoCard = document.createElement('div');
+            repoCard.classList.add('repoCard', 'w-full', 'md:w-1/3', 'lg:w-1/4');
+            repoCard.innerHTML = `
+              <div class="repoTitle font-semibold text-lg">${repo.name}</div>
+              <div class="repoDescription text-sm text-gray-600">${repo.description || 'No description available'}</div>
+              <div class="repoLink mt-2">
+                <a href="${repo.homepage}" target="_blank" class="text-blue-500">Homepage <i class="fas fa-external-link-alt"></i></a>
+              </div>
+            `;
+            repoList.appendChild(repoCard);
+            displayedRepos++;
+          });
+
+          const mainRepo = data.find(repo => repo.name.toLowerCase() === 'main');
+          if (mainRepo) {
+            const mainRepoCard = document.createElement('div');
+            mainRepoCard.innerHTML = `
+              <a href="${mainRepo.homepage}" target="_blank" class="repoCard text-center font-semibold text-blue-500">Go to Main Page <i class="fas fa-external-link-alt"></i></a>
+            `;
+            repoList.appendChild(mainRepoCard);
+          }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+
+// Load Image and Extract Words
+    imageInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            imageCanvas.width = img.width;
+            imageCanvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            uploadedImage = ctx.getImageData(0, 0, img.width, img.height);
+            extractWords(img);
+            saveHistory();
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Extract Words and Draw Boxes
+    function extractWords(image) {
+      Tesseract.recognize(image.src, 'eng').then(({ data }) => {
+        const words = data.words;
+        words.forEach((word) => {
+          const box = document.createElement('div');
+          box.classList.add('word-box');
+          box.style.left = `${word.bbox.x0}px`;
+          box.style.top = `${word.bbox.y0}px`;
+          box.style.width = `${word.bbox.x1 - word.bbox.x0}px`;
+          box.style.height = `${word.bbox.y1 - word.bbox.y0}px`;
+          box.title = word.text;
+
+          // Toggle selection
+          box.addEventListener('click', () => {
+            if (box.classList.toggle('selected')) {
+              selectedBoxes.push(word.bbox);
+            } else {
+              selectedBoxes = selectedBoxes.filter(
+                (b) => b.x0 !== word.bbox.x0 || b.y0 !== word.bbox.y0
+              );
+            }
+            toggleEffectsPanel();
+          });
+
+          imageContainer.appendChild(box);
+        });
+      });
+    }
+
+    // Toggle Effects Panel
+    function toggleEffectsPanel() {
+      if (selectedBoxes.length > 0) {
+        effectsPanel.classList.remove('hidden');
+      } else {
+        effectsPanel.classList.add('hidden');
+      }
+    }
+
+    // Apply Effects
+    applyBlur.addEventListener('click', () => applyEffect('blur(5px)'));
+    applyGrayscale.addEventListener('click', () => applyEffect('grayscale(1)'));
+    applyBrightness.addEventListener('click', () => applyEffect('brightness(1.5)'));
+
+    // Apply Effect to Selected Boxes
+    function applyEffect(effect) {
+      selectedBoxes.forEach((bbox) => {
+        ctx.filter = effect;
+        ctx.drawImage(
+          imageCanvas,
+          bbox.x0,
+          bbox.y0,
+          bbox.x1 - bbox.x0,
+          bbox.y1 - bbox.y0,
+          bbox.x0,
+          bbox.y0,
+          bbox.x1 - bbox.x0,
+          bbox.y1 - bbox.y0
+        );
+        ctx.filter = 'none';
+      });
+      saveHistory();
+    }
+
+    // Undo
+    undoBtn.addEventListener('click', () => {
+      if (currentHistoryIndex > 0) {
+        currentHistoryIndex--;
+        restoreHistory();
+      }
+    });
+
+    // Forward
+    forwardBtn.addEventListener('click', () => {
+      if (currentHistoryIndex < history.length - 1) {
+        currentHistoryIndex++;
+        restoreHistory();
+      }
+    });
+
+    // Reset Image
+    resetBtn.addEventListener('click', () => {
+      ctx.putImageData(uploadedImage, 0, 0);
+      saveHistory();
+    });
+
+    // Download Image
+    downloadBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.href = imageCanvas.toDataURL();
+      link.download = 'edited_image.png';
+      link.click();
+    });
+
+    // Save and Restore History
+    function saveHistory() {
+      if (currentHistoryIndex < history.length - 1) {
+        history = history.slice(0, currentHistoryIndex + 1);
+      }
+      history.push(ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height));
+      currentHistoryIndex++;
+    }
+
+    function restoreHistory() {
+      const state = history[currentHistoryIndex];
+      ctx.putImageData(state, 0, 0);
+    }
+
+    // Close Effects Panel
+    closePanel.addEventListener('click', () => {
+      effectsPanel.classList.add('hidden');
+    });
+  </script>
+
+</body>
+</html>
