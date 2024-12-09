@@ -141,6 +141,9 @@
       <div class="flex flex-wrap" id="repoList"></div>
     </div>
   </div>
+<div id="loading" class="hidden fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
+  <span class="text-white text-2xl font-bold">Loading...</span>
+</div>
 
   <script>
     const tabSelector = document.getElementById('tabSelector');
@@ -272,6 +275,8 @@
     const { data: { text } } = await Tesseract.recognize(file, languages);
     const words = text.split("\n").map(word => word.trim()).filter(word => word.length > 0);
 
+
+
     // عرض البيانات المستخرجة في الجدول
 
         // Display extracted data in table
@@ -286,7 +291,31 @@
 
 
     
-    
+    const loading = document.getElementById('loading');
+
+// عندما تبدأ عملية استخراج النصوص، يظهر الـ Loading
+imageInput.addEventListener('change', async (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    loading.classList.remove('hidden'); // إظهار الـ Loading
+
+    uploadedImage = file;
+    const { data: { text } } = await Tesseract.recognize(file, 'eng');
+    const words = text.split("\n").map(word => word.trim()).filter(word => word.length > 0);
+
+    // إخفاء الـ Loading بعد الانتهاء
+    loading.classList.add('hidden');
+
+    // عرض البيانات المستخلصة في الجدول
+    extractedDataTable.innerHTML = words.map((word, index) => `
+      <tr>
+        <td class="px-4 py-2">${word}</td>
+        <td class="px-4 py-2">${(Math.random() * 100).toFixed(2)}%</td>
+      </tr>
+    `).join('');
+  }
+});
+
 
 
     
@@ -405,4 +434,4 @@
   </script>
 
 </body>
-</html>
+  </html>
