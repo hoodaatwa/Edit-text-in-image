@@ -264,8 +264,15 @@
       const file = event.target.files[0];
       if (file) {
         uploadedImage = file;
-        const { data: { text } } = await Tesseract.recognize(file, 'eng');
-        const words = text.split("\n").map(word => word.trim()).filter(word => word.length > 0);
+
+    // تحديد اللغات التي تريد التعرف عليها (مثال: الإنجليزية، العربية، الإسبانية...)
+    const languages = 'eng+ara+spa+fra+deu+ita+por+rus+jpn+chi_sim';
+
+    // التعرف على النصوص
+    const { data: { text } } = await Tesseract.recognize(file, languages);
+    const words = text.split("\n").map(word => word.trim()).filter(word => word.length > 0);
+
+    // عرض البيانات المستخرجة في الجدول
 
         // Display extracted data in table
         extractedDataTable.innerHTML = words.map((word, index) => `
@@ -279,27 +286,7 @@
 
 
     
-    imageInput.addEventListener('change', async (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    uploadedImage = file;
-
-    // تحديد اللغات التي تريد التعرف عليها (مثال: الإنجليزية، العربية، الإسبانية...)
-    const languages = 'eng+ara+spa+fra+deu+ita+por+rus+jpn+chi_sim';
-
-    // التعرف على النصوص
-    const { data: { text } } = await Tesseract.recognize(file, languages);
-    const words = text.split("\n").map(word => word.trim()).filter(word => word.length > 0);
-
-    // عرض البيانات المستخرجة في الجدول
-    extractedDataTable.innerHTML = words.map((word, index) => `
-      <tr>
-        <td class="px-4 py-2">${word}</td>
-        <td class="px-4 py-2">${(Math.random() * 100).toFixed(2)}%</td>
-      </tr>
-    `).join('');
-  }
-});
+    
 
 
     
