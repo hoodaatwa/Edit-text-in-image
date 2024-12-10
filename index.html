@@ -216,7 +216,7 @@
             }
 
             const repoCard = document.createElement('div');
-            repoCard.classList.add('repoCard', 'w-full', 'md:w-1/3', 'lg:w-1/4');
+            repoCard.classList.add('repoCard', 'w-full', 'md:w-1/1', 'lg:w-1/2');
             repoCard.innerHTML = `
               <div class="repoTitle font-semibold text-lg">${repo.name}</div>
               <div class="repoDescription text-sm text-gray-600">${repo.description || 'No description available'}</div>
@@ -232,6 +232,7 @@
           if (mainRepo) {
             const mainRepoCard = document.createElement('div');
             mainRepoCard.innerHTML = `
+<br>
               <a href="${mainRepo.homepage}" target="_blank" class="repoCard text-center font-semibold text-blue-500">Go to Main Page <i class="fas fa-external-link-alt"></i></a>
             `;
             repoList.appendChild(mainRepoCard);
@@ -461,4 +462,4 @@ const languages = 'eng+ara';
   </script>
 
 </body>
-</html>
+  </html>
