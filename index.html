@@ -325,6 +325,9 @@ imageInput.addEventListener('change', async (event) => {
     const { data: { text } } = await Tesseract.recognize(file, 'eng');
     const words = text.split("\n").map(word => word.trim()).filter(word => word.length > 0);
 
+    extractedDataTable.innerHTML = '';
+
+
     // إخفاء الـ Loading بعد الانتهاء
     loading.classList.add('hidden');
 
