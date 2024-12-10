@@ -144,33 +144,33 @@
 <div id="loading" class="hidden fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
   <span class="text-white text-2xl font-bold">Loading...</span>
 </div>
-
   <script>
     const tabSelector = document.getElementById('tabSelector');
-    const extractedDataTab = document.getElementById('tab-extracted-data');
-    const editTab = document.getElementById('tab-edit');
-    const otherToolsTab = document.getElementById('tab-other-tools');
-    const imageInput = document.getElementById('imageInput');
-    const imageCanvas = document.getElementById('imageCanvas');
-    const ctx = imageCanvas.getContext('2d');
-    const imageContainer = document.getElementById('image-container');
-    const effectsPanel = document.getElementById('effectsPanel');
-    const actionBar = document.getElementById('actionBar');
-    const applyBlur = document.getElementById('applyBlur');
-    const applyGrayscale = document.getElementById('applyGrayscale');
-    const applyBrightness = document.getElementById('applyBrightness');
-    const closePanel = document.getElementById('closePanel');
-    const undoBtn = document.getElementById('undoBtn');
-    const forwardBtn = document.getElementById('forwardBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const repoList = document.getElementById('repoList');
-    const extractedDataTable = document.getElementById('extractedDataTable');
+  const extractedDataTab = document.getElementById('tab-extracted-data');
+  const editTab = document.getElementById('tab-edit');
+  const otherToolsTab = document.getElementById('tab-other-tools');
+  const imageInput = document.getElementById('imageInput');
+  const imageCanvas = document.getElementById('imageCanvas');
+  const ctx = imageCanvas.getContext('2d');
+  const imageContainer = document.getElementById('image-container');
+  const effectsPanel = document.getElementById('effectsPanel');
+  const actionBar = document.getElementById('actionBar');
+  const applyBlur = document.getElementById('applyBlur');
+  const applyGrayscale = document.getElementById('applyGrayscale');
+  const applyBrightness = document.getElementById('applyBrightness');
+  const closePanel = document.getElementById('closePanel');
+  const undoBtn = document.getElementById('undoBtn');
+  const forwardBtn = document.getElementById('forwardBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const repoList = document.getElementById('repoList');
+  const extractedDataTable = document.getElementById('extractedDataTable');
 
-    let uploadedImage = null;
-    let selectedBoxes = [];
-    let history = [];
-    let currentHistoryIndex = -1;
+  let uploadedImage = null;
+  let selectedBoxes = [];
+  let rectangles = []; // مصفوفة لتخزين المربعات المرسومة
+  let history = [];
+  let currentHistoryIndex = -1;
 
     // Tab Switching Logic
     tabSelector.addEventListener('change', () => {
@@ -241,25 +241,50 @@
     }
 
 // Load Image and Extract Words
-    imageInput.addEventListener('change', (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = new Image();
-          img.onload = () => {
-            imageCanvas.width = img.width;
-            imageCanvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-            uploadedImage = ctx.getImageData(0, 0, img.width, img.height);
-            extractWords(img);
-            saveHistory();
-          };
-          img.src = e.target.result;
+// Load Image and Extract Words
+// إعادة تعيين canvas والمربعات
+  function resetCanvasAndBoxes() {
+    ctx.clearRect(0, 0, imageCanvas.width, imageCanvas.height); // مسح canvas
+    rectangles = []; // مسح المربعات المخزنة
+    selectedBoxes = []; // مسح المربعات المحددة
+    // إزالة المربعات من DOM
+    const wordBoxes = document.querySelectorAll('.word-box');
+    wordBoxes.forEach((box) => box.remove());
+  }
+
+  // تحميل الصورة واستخراج الكلمات
+  imageInput.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          // إعادة ضبط أبعاد canvas لتناسب أبعاد الصورة
+          imageCanvas.width = img.width;
+          imageCanvas.height = img.height;
+
+          // إعادة تعيين canvas والمربعات
+          resetCanvasAndBoxes();
+          
+          extractedDataTable.innerHTML = '';
+
+
+          // رسم الصورة الجديدة
+          ctx.drawImage(img, 0, 0);
+
+          // تحديث البيانات وتحليل النصوص
+          uploadedImage = ctx.getImageData(0, 0, img.width, img.height);
+
+          // استدعاء الدوال الأخرى
+          extractWords(img);
+          saveHistory();
         };
-        reader.readAsDataURL(file);
-      }
-    });
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
 
     
 // Handle Image Input and Extract Data
@@ -275,8 +300,6 @@
     const { data: { text } } = await Tesseract.recognize(file, languages);
     const words = text.split("\n").map(word => word.trim()).filter(word => word.length > 0);
 
-
-
     // عرض البيانات المستخرجة في الجدول
 
         // Display extracted data in table
@@ -290,7 +313,6 @@
     });
 
 
-    
     const loading = document.getElementById('loading');
 
 // عندما تبدأ عملية استخراج النصوص، يظهر الـ Loading
@@ -315,7 +337,7 @@ imageInput.addEventListener('change', async (event) => {
     `).join('');
   }
 });
-
+    
 
 
     
@@ -434,4 +456,4 @@ imageInput.addEventListener('change', async (event) => {
   </script>
 
 </body>
-  </html>
+</html>
