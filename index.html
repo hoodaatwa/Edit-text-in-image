@@ -294,7 +294,7 @@
         uploadedImage = file;
 
     // تحديد اللغات التي تريد التعرف عليها (مثال: الإنجليزية، العربية، الإسبانية...)
-    const languages = 'eng+ara+spa+fra+deu+ita+por+rus+jpn+chi_sim';
+    const languages = 'eng+ara';
 
     // التعرف على النصوص
     const { data: { text } } = await Tesseract.recognize(file, languages);
@@ -321,7 +321,7 @@ imageInput.addEventListener('change', async (event) => {
   if (file) {
     loading.classList.remove('hidden'); // إظهار الـ Loading
 
-const languages = 'eng+ara+spa+fra+deu+ita+por+rus+jpn+chi_sim';
+const languages = 'eng+ara';
 
     uploadedImage = file;
     const { data: { text } } = await Tesseract.recognize(file, languages);
@@ -344,7 +344,7 @@ const languages = 'eng+ara+spa+fra+deu+ita+por+rus+jpn+chi_sim';
 });
     
 
-const languages = 'eng+ara+spa+fra+deu+ita+por+rus+jpn+chi_sim';
+const languages = 'eng+ara';
     
     // Extract Words and Draw Boxes
     function extractWords(image) {
