@@ -185,6 +185,7 @@
         extractedDataTab.classList.add('hidden');
         editTab.classList.remove('hidden');
         otherToolsTab.classList.add('hidden');
+
         effectsPanel.classList.remove('hidden');
         actionBar.classList.remove('hidden');
       } else {
@@ -193,7 +194,13 @@
         otherToolsTab.classList.remove('hidden');
         effectsPanel.classList.add('hidden');
         actionBar.classList.add('hidden');
-        fetchGitHubRepos();
+        // تحقق إذا كان المحتوى موجودًا مسبقًا
+  const repoList = document.getElementById('repoList');
+  if (repoList && repoList.children.length === 0) {
+    fetchGitHubRepos(); // استدعاء الدالة فقط إذا كان المحتوى غير موجود
+  }
+
+
       }
     });
 
@@ -233,7 +240,7 @@
             const mainRepoCard = document.createElement('div');
             mainRepoCard.innerHTML = `
 <br>
-              <a href="${mainRepo.homepage}" target="_blank" class="repoCard text-center font-semibold text-blue-500">Go to Main Page <i class="fas fa-external-link-alt"></i></a>
+              <a href="${mainRepo.homepage}" target="_blank" class="repoCard text-center font-semibold text-blue-500">Go to Main Page <i class="fas fa-external-link-alt"></i></a><br>
             `;
             repoList.appendChild(mainRepoCard);
           }
@@ -462,4 +469,4 @@ const languages = 'eng+ara';
   </script>
 
 </body>
-  </html>
+</html>
