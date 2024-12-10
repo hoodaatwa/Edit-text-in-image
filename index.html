@@ -321,8 +321,10 @@ imageInput.addEventListener('change', async (event) => {
   if (file) {
     loading.classList.remove('hidden'); // إظهار الـ Loading
 
+const languages = 'eng+ara+spa+fra+deu+ita+por+rus+jpn+chi_sim';
+
     uploadedImage = file;
-    const { data: { text } } = await Tesseract.recognize(file, 'eng');
+    const { data: { text } } = await Tesseract.recognize(file, languages);
     const words = text.split("\n").map(word => word.trim()).filter(word => word.length > 0);
 
     extractedDataTable.innerHTML = '';
@@ -342,11 +344,11 @@ imageInput.addEventListener('change', async (event) => {
 });
     
 
-
+const languages = 'eng+ara+spa+fra+deu+ita+por+rus+jpn+chi_sim';
     
     // Extract Words and Draw Boxes
     function extractWords(image) {
-      Tesseract.recognize(image.src, 'eng').then(({ data }) => {
+      Tesseract.recognize(image.src, languages).then(({ data }) => {
         const words = data.words;
         words.forEach((word) => {
           const box = document.createElement('div');
