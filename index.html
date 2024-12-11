@@ -148,6 +148,7 @@
 <button id="toggleBoxesBtn" class="block w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
   Toggle Word Boxes
 </button>
+
         <button id="undoBtn" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Undo</button>
         <button id="forwardBtn" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Forward</button>
         <button id="resetBtn" class="bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600">Reset</button>
@@ -493,7 +494,7 @@ removeColorBtn.addEventListener('click', () => {
 // استخدام ColorThief لاستخراج الألوان من الصورة
 function extractColors(image) {
   const colorThief = new ColorThief();
-  const colors = colorThief.getPalette(image, 25); // استخراج 25 ألوان من الصورة
+  const colors = colorThief.getPalette(image, 10); // استخراج 10 ألوان من الصورة
   const colorsContainer = document.getElementById('colorsContainer');
   colorsContainer.innerHTML = ''; // مسح الألوان السابقة
 
@@ -573,15 +574,6 @@ imageInput.addEventListener('change', (event) => {
   }
 });
 
-const toggleBoxesBtn = document.getElementById('toggleBoxesBtn');
-
-// إضافة وظيفة لتبديل ظهور المربعات
-toggleBoxesBtn.addEventListener('click', () => {
-  const wordBoxes = document.querySelectorAll('.word-box');
-  wordBoxes.forEach((box) => {
-    box.style.display = box.style.display === 'none' ? 'block' : 'none';
-  });
-});
 
 
 
@@ -609,6 +601,21 @@ toggleBoxesBtn.addEventListener('click', () => {
       });
       saveHistory();
     }
+
+
+
+
+const toggleBoxesBtn = document.getElementById('toggleBoxesBtn');
+
+// إضافة وظيفة لتبديل ظهور المربعات
+toggleBoxesBtn.addEventListener('click', () => {
+  const wordBoxes = document.querySelectorAll('.word-box');
+  wordBoxes.forEach((box) => {
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  });
+});
+
+
 
     // Undo
     undoBtn.addEventListener('click', () => {
