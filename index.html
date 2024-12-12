@@ -83,8 +83,10 @@
       <img src="https://github.com/hoodaatwa/Edit-text-in-image/blob/main/edited_image%20(12).png?raw=true" alt="Logo" class="w-10 h-10">
 <button class="block w-auto bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600" id="stopButton" style="display: none;">Disable Brush</button>
 
+<button id="toggleCreateMode" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Toggle Create Mode</button>
+
       <div class="relative">
-        <select id="tabSelector" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        <select id="tabSelector" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-lg">
           <option value="tab-extracted-data">Extracted Data</option>
           <option value="tab-edit" selected>Edit</option>
           <option value="tab-other-tools">Other Tools</option>
@@ -696,6 +698,86 @@ toggleBoxesBtn.addEventListener('click', () => {
     closePanel.addEventListener('click', () => {
       effectsPanel.classList.add('hidden');
     });
+
+
+
+
+
+let createMode = false; // الحالة الافتراضية لوضع الإنشاء
+let startX, startY;
+
+// زر تفعيل/إيقاف وضع الإنشاء
+document.getElementById('toggleCreateMode').addEventListener('click', () => {
+  createMode = !createMode;
+  alert(`Create Mode is now ${createMode ? 'ON' : 'OFF'}`);
+});
+
+// إضافة حدث للنقر على الصورة
+imageContainer.addEventListener('mousedown', (e) => {
+  if (!createMode) return;
+
+  // تسجيل نقطة البداية
+  const rect = imageContainer.getBoundingClientRect();
+  startX = e.clientX - rect.left;
+  startY = e.clientY - rect.top;
+
+  // إنشاء مربع مؤقت
+  const newBox = document.createElement('div');
+  newBox.classList.add('word-box');
+  newBox.style.left = `${startX}px`;
+  newBox.style.top = `${startY}px`;
+  newBox.style.width = `0px`;
+  newBox.style.height = `0px`;
+
+  imageContainer.appendChild(newBox);
+
+  // متابعة السحب لتحديد أبعاد المربع
+  const onMouseMove = (moveEvent) => {
+    const currentX = moveEvent.clientX - rect.left;
+    const currentY = moveEvent.clientY - rect.top;
+    const width = currentX - startX;
+    const height = currentY - startY;
+
+    newBox.style.width = `${Math.abs(width)}px`;
+    newBox.style.height = `${Math.abs(height)}px`;
+    newBox.style.left = `${width < 0 ? currentX : startX}px`;
+    newBox.style.top = `${height < 0 ? currentY : startY}px`;
+  };
+
+  // إنهاء السحب
+  const onMouseUp = () => {
+    // تطبيق الخصائص الافتراضية على المربع
+    newBox.addEventListener('click', () => {
+      if (newBox.classList.toggle('selected')) {
+        selectedBoxes.push({
+          x0: parseInt(newBox.style.left),
+          y0: parseInt(newBox.style.top),
+          x1: parseInt(newBox.style.left) + parseInt(newBox.style.width),
+          y1: parseInt(newBox.style.top) + parseInt(newBox.style.height),
+        });
+      } else {
+        selectedBoxes = selectedBoxes.filter(
+          (b) =>
+            b.x0 !== parseInt(newBox.style.left) ||
+            b.y0 !== parseInt(newBox.style.top)
+        );
+      }
+      toggleEffectsPanel();
+    });
+
+    rectangles.push(newBox); // تخزين المربع الجديد
+    saveHistory(); // حفظ الحالة الحالية
+
+    // إزالة أحداث السحب
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+});
+
+
   </script>
 
 </body>
