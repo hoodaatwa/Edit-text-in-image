@@ -118,13 +118,12 @@
       </div>
       
       <!-- Effects Panel -->
-      <div id="effectsPanel" class="hidden">
+      <div id="effectsPanel" class="hidden h-60 overflow-y-auto bg-gray-100 p-4 rounded shadow-md">
         <h3 class="text-lg font-semibold mb-2">Effects Panel</h3>
 <div id="colorPalette" class="space-y-2">
   <h4 class="font-semibold">Choose Brush Color</h4>
-  <div id="colorsContainer" class="flex space-x-2"></div>
+  <div id="colorsContainer" class="grid grid-cols-6 gap-2 shadow-md py-2 px-4"></div>
 </div>
-
 
         <div class="space-y-2">
           <button id="applyBlur" class="block w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Apply Blur</button>
@@ -494,7 +493,7 @@ removeColorBtn.addEventListener('click', () => {
 // استخدام ColorThief لاستخراج الألوان من الصورة
 function extractColors(image) {
   const colorThief = new ColorThief();
-  const colors = colorThief.getPalette(image, 10); // استخراج 10 ألوان من الصورة
+  const colors = colorThief.getPalette(image, 30); // استخراج 30 ألوان من الصورة
   const colorsContainer = document.getElementById('colorsContainer');
   colorsContainer.innerHTML = ''; // مسح الألوان السابقة
 
