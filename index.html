@@ -81,6 +81,8 @@
   <nav class="bg-white shadow fixed w-full top-0 z-50">
     <div class="container mx-auto px-4 py-1 flex items-center justify-between">
       <img src="https://github.com/hoodaatwa/Edit-text-in-image/blob/main/edited_image%20(12).png?raw=true" alt="Logo" class="w-10 h-10">
+<button class="block w-auto bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600" id="stopButton" style="display: none;">Disable Brush</button>
+
       <div class="relative">
         <select id="tabSelector" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
           <option value="tab-extracted-data">Extracted Data</option>
@@ -489,6 +491,7 @@ removeColorBtn.addEventListener('click', () => {
 
 
 
+
 // تحميل مكتبة Color Thief
 // استخدام ColorThief لاستخراج الألوان من الصورة
 function extractColors(image) {
@@ -508,6 +511,12 @@ function extractColors(image) {
   });
 }
 
+// إضافة زر لإيقاف الفرشاة
+const stopButton = document.getElementById('stopButton');
+
+// إضافة حدث الزر لإيقاف الفرشاة
+stopButton.addEventListener('click', stopBrush);
+
 // دالة لاختيار اللون
 let selectedColor = null;
 
@@ -517,9 +526,12 @@ function selectColor(color) {
 
   // تفعيل الفرشاة
   activateBrush();
+
+  // إظهار زر إيقاف الفرشاة
+  toggleStopButton(true);
 }
 
-// تفعيل الفرشاة
+// دالة لتفعيل الفرشاة
 function activateBrush() {
   if (!selectedColor) return;
   imageCanvas.addEventListener('mousedown', startDrawing);
@@ -551,6 +563,26 @@ function draw(event) {
 function stopDrawing() {
   drawing = false;
 }
+
+// دالة لإيقاف الفرشاة
+function stopBrush() {
+  drawing = false; // إيقاف الرسم
+  imageCanvas.removeEventListener('mousedown', startDrawing);
+  imageCanvas.removeEventListener('mousemove', draw);
+  imageCanvas.removeEventListener('mouseup', stopDrawing);
+  imageCanvas.removeEventListener('mouseout', stopDrawing);
+  console.log('Brush stopped');
+
+  // إخفاء زر إيقاف الفرشاة بعد التوقف
+  toggleStopButton(false);
+  effectsPanel.classList.remove('hidden');
+}
+
+// دالة لتغيير حالة زر إيقاف الفرشاة بين الظهور والإخفاء
+function toggleStopButton(show) {
+  stopButton.style.display = show ? 'block' : 'none';
+}
+
 
 // عند تحميل الصورة
 imageInput.addEventListener('change', (event) => {
