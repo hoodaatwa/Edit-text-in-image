@@ -702,36 +702,35 @@ document.getElementById('toggleCreateMode').addEventListener('click', () => {
   alert(`Create Mode is now ${createMode ? 'ON' : 'OFF'}`);
 });
 
-// إضافة أحداث للنقر على الصورة
-imageContainer.addEventListener('mousedown', startBoxCreation);
-imageContainer.addEventListener('touchstart', (e) => {
-  e.preventDefault(); // منع السلوك الافتراضي
-  startBoxCreation(e.touches[0]);
-});
+// إضافة حدث للنقر أو اللمس على الصورة
+imageContainer.addEventListener('mousedown', startCreateBox);
+imageContainer.addEventListener('touchstart', startCreateBox);
 
-function startBoxCreation(e) {
+function startCreateBox(e) {
   if (!createMode) return;
+
+  // التعامل مع الأحداث اللمسية
+  e.preventDefault();  // لمنع سلوكيات افتراضية مثل التمرير
 
   // تسجيل نقطة البداية
   const rect = imageContainer.getBoundingClientRect();
-  startX = e.clientX - rect.left;
-  startY = e.clientY - rect.top;
+  startX = e.clientX ? e.clientX - rect.left : e.touches[0].clientX - rect.left;
+  startY = e.clientY ? e.clientY - rect.top : e.touches[0].clientY - rect.top;
 
   // إنشاء مربع مؤقت
   const newBox = document.createElement('div');
   newBox.classList.add('word-box');
   newBox.style.left = `${startX}px`;
   newBox.style.top = `${startY}px`;
-  newBox.style.width = `0px`;
-  newBox.style.height = `0px`;
+  newBox.style.width = '0px';
+  newBox.style.height = '0px';
 
   imageContainer.appendChild(newBox);
 
   // متابعة السحب لتحديد أبعاد المربع
   const onMove = (moveEvent) => {
-    const touch = moveEvent.touches ? moveEvent.touches[0] : moveEvent;
-    const currentX = touch.clientX - rect.left;
-    const currentY = touch.clientY - rect.top;
+    const currentX = moveEvent.clientX ? moveEvent.clientX - rect.left : moveEvent.touches[0].clientX - rect.left;
+    const currentY = moveEvent.clientY ? moveEvent.clientY - rect.top : moveEvent.touches[0].clientY - rect.top;
     const width = currentX - startX;
     const height = currentY - startY;
 
@@ -745,7 +744,6 @@ function startBoxCreation(e) {
   const onEnd = () => {
     // تطبيق الخصائص الافتراضية على المربع
     newBox.addEventListener('click', () => {
-      // تفعيل أو تعطيل مربع الاختيار
       if (newBox.classList.toggle('selected')) {
         selectedBoxes.push({
           x0: parseInt(newBox.style.left),
@@ -760,7 +758,7 @@ function startBoxCreation(e) {
             b.y0 !== parseInt(newBox.style.top)
         );
       }
-      toggleEffectsPanel(); // التفاعل مع Effects Panel
+      toggleEffectsPanel();
     });
 
     rectangles.push(newBox); // تخزين المربع الجديد
@@ -773,12 +771,12 @@ function startBoxCreation(e) {
     document.removeEventListener('touchend', onEnd);
   };
 
-  // إضافة أحداث السحب
   document.addEventListener('mousemove', onMove);
   document.addEventListener('mouseup', onEnd);
   document.addEventListener('touchmove', onMove);
   document.addEventListener('touchend', onEnd);
 }
+
 
 
 
