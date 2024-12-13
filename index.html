@@ -745,6 +745,7 @@ function startBoxCreation(e) {
   const onEnd = () => {
     // تطبيق الخصائص الافتراضية على المربع
     newBox.addEventListener('click', () => {
+      // تفعيل أو تعطيل مربع الاختيار
       if (newBox.classList.toggle('selected')) {
         selectedBoxes.push({
           x0: parseInt(newBox.style.left),
@@ -759,16 +760,11 @@ function startBoxCreation(e) {
             b.y0 !== parseInt(newBox.style.top)
         );
       }
-      toggleEffectsPanel(); // تفعيل التأثيرات بعد تحديد المربع
+      toggleEffectsPanel(); // التفاعل مع Effects Panel
     });
 
     rectangles.push(newBox); // تخزين المربع الجديد
     saveHistory(); // حفظ الحالة الحالية
-
-    // إعادة تطبيق التأثيرات على المربع الجديد
-    if (newBox.classList.contains('selected')) {
-      toggleEffectsPanel();
-    }
 
     // إزالة أحداث السحب
     document.removeEventListener('mousemove', onMove);
@@ -777,6 +773,7 @@ function startBoxCreation(e) {
     document.removeEventListener('touchend', onEnd);
   };
 
+  // إضافة أحداث السحب
   document.addEventListener('mousemove', onMove);
   document.addEventListener('mouseup', onEnd);
   document.addEventListener('touchmove', onMove);
