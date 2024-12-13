@@ -827,6 +827,30 @@ function startBoxCreation(e) {
       });
     });
   }
+
+
+box.addEventListener('click', () => {
+  toggleSelection(box);
+});
+
+// إضافة دعم للأحداث على الهاتف
+box.addEventListener('touchstart', (event) => {
+  event.preventDefault(); // لمنع التفاعل المزدوج
+  toggleSelection(box);
+});
+
+// دالة لتغيير حالة التحديد
+function toggleSelection(box) {
+  if (box.classList.toggle('selected')) {
+    selectedBoxes.push(word.bbox);
+  } else {
+    selectedBoxes = selectedBoxes.filter(
+      (b) => b.x0 !== word.bbox.x0 || b.y0 !== word.bbox.y0
+    );
+  }
+  toggleEffectsPanel();
+}
+
   </script>
 
 </body>
