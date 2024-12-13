@@ -131,15 +131,27 @@
           <button id="applyGrayscale" class="block w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">Apply Grayscale</button>
           <button id="applyBrightness" class="block w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600">Increase Brightness</button>
 <button id="applyContrast" class="block w-full bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600">Increase Contrast</button>
-<div class="mb-4">
-  <label for="removeColorInput" class="block text-sm font-medium text-gray-700">Enter Color to Remove (Hex):</label>
-  <input type="color" id="colorInput" class="block w-full text-sm text-gray-500">
 
+
+
+<div style="border: 1px solid #ccc; padding: 10px; margin: 10px;">
+  <label for="removeColorInput" class="block text-sm font-medium text-gray-700">Enter Color to Remove (Hex):</label>
+  <input type="color" id="removeColorInput" class="block w-full text-sm text-gray-500" />
+
+  <label for="replaceColorInput" class="block text-sm font-medium text-gray-700 mt-4">Enter Color to Replace With (Hex):</label>
+  <input type="color" id="replaceColorInput" class="block w-full text-sm text-gray-500" />
+
+  <label for="colorTolerance" class="block text-sm font-medium text-gray-700 mt-4">Color Tolerance:</label>
+  <input type="range" id="colorTolerance" class="w-full" min="0" max="255" value="60" />
 </div>
-<button id="removeColorBtn" class="block w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Remove Color</button>
+
+<button id="removeColorBtn" class="block w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Remove and Replace Color</button>
 
 
         </div>
+
+
+
         <button id="closePanel" class="mt-4 block w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Close Panel</button>
       </div>
 
@@ -439,8 +451,10 @@ applyContrast.addEventListener('click', () => {
 
 // إزالة لون محدد
 // استهداف
+const removeColorInput = document.getElementById('removeColorInput');
+const replaceColorInput = document.getElementById('replaceColorInput');
+const colorToleranceInput = document.getElementById('colorTolerance');
 const removeColorBtn = document.getElementById('removeColorBtn');
-const removeColorInput = document.getElementById('colorInput');
 
 // تحويل اللون Hex إلى RGB
 function hexToRgb(hex) {
@@ -452,16 +466,19 @@ function hexToRgb(hex) {
   };
 }
 
-// إزالة اللون من البكسلات
+// إزالة اللون واستبداله
 removeColorBtn.addEventListener('click', () => {
-  const colorHex = removeColorInput.value.trim();
-  if (!/^#[0-9A-Fa-f]{6}$/.test(colorHex)) {
-    alert('Please enter a valid hex color code.');
+  const removeColorHex = removeColorInput.value.trim();
+  const replaceColorHex = replaceColorInput.value.trim();
+  const tolerance = parseInt(colorToleranceInput.value);
+
+  if (!/^#[0-9A-Fa-f]{6}$/.test(removeColorHex) || !/^#[0-9A-Fa-f]{6}$/.test(replaceColorHex)) {
+    alert('Please enter valid hex color codes.');
     return;
   }
 
-  const targetColor = hexToRgb(colorHex);
-  const tolerance = 60; // السماح باختلاف بسيط في اللون
+  const targetRemoveColor = hexToRgb(removeColorHex);
+  const targetReplaceColor = hexToRgb(replaceColorHex);
 
   selectedBoxes.forEach((bbox) => {
     const imageData = ctx.getImageData(
@@ -477,13 +494,14 @@ removeColorBtn.addEventListener('click', () => {
       const b = imageData.data[i + 2];
 
       if (
-        Math.abs(r - targetColor.r) <= tolerance &&
-        Math.abs(g - targetColor.g) <= tolerance &&
-        Math.abs(b - targetColor.b) <= tolerance
+        Math.abs(r - targetRemoveColor.r) <= tolerance &&
+        Math.abs(g - targetRemoveColor.g) <= tolerance &&
+        Math.abs(b - targetRemoveColor.b) <= tolerance
       ) {
-        imageData.data[i] = 255; // تحويل الأحمر إلى أبيض
-        imageData.data[i + 1] = 255; // تحويل الأخضر إلى أبيض
-        imageData.data[i + 2] = 255; // تحويل الأزرق إلى أبيض
+        // استبدال اللون
+        imageData.data[i] = targetReplaceColor.r;
+        imageData.data[i + 1] = targetReplaceColor.g;
+        imageData.data[i + 2] = targetReplaceColor.b;
       }
     }
 
