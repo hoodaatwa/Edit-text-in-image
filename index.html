@@ -702,8 +702,14 @@ document.getElementById('toggleCreateMode').addEventListener('click', () => {
   alert(`Create Mode is now ${createMode ? 'ON' : 'OFF'}`);
 });
 
-// إضافة حدث للنقر على الصورة
-imageContainer.addEventListener('mousedown', (e) => {
+// إضافة أحداث للنقر على الصورة
+imageContainer.addEventListener('mousedown', startBoxCreation);
+imageContainer.addEventListener('touchstart', (e) => {
+  e.preventDefault(); // منع السلوك الافتراضي
+  startBoxCreation(e.touches[0]);
+});
+
+function startBoxCreation(e) {
   if (!createMode) return;
 
   // تسجيل نقطة البداية
@@ -722,9 +728,10 @@ imageContainer.addEventListener('mousedown', (e) => {
   imageContainer.appendChild(newBox);
 
   // متابعة السحب لتحديد أبعاد المربع
-  const onMouseMove = (moveEvent) => {
-    const currentX = moveEvent.clientX - rect.left;
-    const currentY = moveEvent.clientY - rect.top;
+  const onMove = (moveEvent) => {
+    const touch = moveEvent.touches ? moveEvent.touches[0] : moveEvent;
+    const currentX = touch.clientX - rect.left;
+    const currentY = touch.clientY - rect.top;
     const width = currentX - startX;
     const height = currentY - startY;
 
@@ -735,7 +742,7 @@ imageContainer.addEventListener('mousedown', (e) => {
   };
 
   // إنهاء السحب
-  const onMouseUp = () => {
+  const onEnd = () => {
     // تطبيق الخصائص الافتراضية على المربع
     newBox.addEventListener('click', () => {
       if (newBox.classList.toggle('selected')) {
@@ -759,14 +766,17 @@ imageContainer.addEventListener('mousedown', (e) => {
     saveHistory(); // حفظ الحالة الحالية
 
     // إزالة أحداث السحب
-    document.removeEventListener('mousemove', onMouseMove);
-    document.removeEventListener('mouseup', onMouseUp);
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onEnd);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onEnd);
   };
 
-  document.addEventListener('mousemove', onMouseMove);
-  document.addEventListener('mouseup', onMouseUp);
-});
-
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onEnd);
+  document.addEventListener('touchmove', onMove);
+  document.addEventListener('touchend', onEnd);
+}
 
 
   // Select the Delete button
