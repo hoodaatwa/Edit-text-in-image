@@ -380,35 +380,35 @@ const languages = 'eng+ara';
 
 const languages = 'eng+ara';
     
-    // Extract Words and Draw Boxes
-    function extractWords(image) {
-      Tesseract.recognize(image.src, languages).then(({ data }) => {
-        const words = data.words;
-        words.forEach((word) => {
-          const box = document.createElement('div');
-          box.classList.add('word-box');
-          box.style.left = `${word.bbox.x0}px`;
-          box.style.top = `${word.bbox.y0}px`;
-          box.style.width = `${word.bbox.x1 - word.bbox.x0}px`;
-          box.style.height = `${word.bbox.y1 - word.bbox.y0}px`;
-          box.title = word.text;
+function extractWords(image) {
+  Tesseract.recognize(image.src, languages).then(({ data }) => {
+    const words = data.words;
+    words.forEach((word) => {
+      const box = document.createElement('div');
+      box.classList.add('word-box');
+      box.style.left = `${word.bbox.x0}px`;
+      box.style.top = `${word.bbox.y0}px`;
+      box.style.width = `${word.bbox.x1 - word.bbox.x0}px`;
+      box.style.height = `${word.bbox.y1 - word.bbox.y0}px`;
+      box.title = word.text;
 
-          // Toggle selection
-          box.addEventListener('click', () => {
-            if (box.classList.toggle('selected')) {
-              selectedBoxes.push(word.bbox);
-            } else {
-              selectedBoxes = selectedBoxes.filter(
-                (b) => b.x0 !== word.bbox.x0 || b.y0 !== word.bbox.y0
-              );
-            }
-            toggleEffectsPanel();
-          });
-
-          imageContainer.appendChild(box);
-        });
+      // Toggle selection
+      box.addEventListener('click', () => {
+        if (box.classList.toggle('selected')) {
+          selectedBoxes.push(word.bbox);
+        } else {
+          selectedBoxes = selectedBoxes.filter(
+            (b) => b.x0 !== word.bbox.x0 || b.y0 !== word.bbox.y0
+          );
+        }
+        toggleEffectsPanel();
       });
-    }
+
+      imageContainer.appendChild(box);
+    });
+  });
+}
+
 
     // Toggle Effects Panel
     function toggleEffectsPanel() {
@@ -611,25 +611,25 @@ imageInput.addEventListener('change', (event) => {
 
 
 
-    // Apply Effect to Selected Boxes
-    function applyEffect(effect) {
-      selectedBoxes.forEach((bbox) => {
-        ctx.filter = effect;
-        ctx.drawImage(
-          imageCanvas,
-          bbox.x0,
-          bbox.y0,
-          bbox.x1 - bbox.x0,
-          bbox.y1 - bbox.y0,
-          bbox.x0,
-          bbox.y0,
-          bbox.x1 - bbox.x0,
-          bbox.y1 - bbox.y0
-        );
-        ctx.filter = 'none';
-      });
-      saveHistory();
-    }
+function applyEffect(effect) {
+  selectedBoxes.forEach((bbox) => {
+    ctx.filter = effect; // تطبيق التأثير على الـ canvas
+    ctx.drawImage(
+      imageCanvas,
+      bbox.x0,
+      bbox.y0,
+      bbox.x1 - bbox.x0,
+      bbox.y1 - bbox.y0,
+      bbox.x0,
+      bbox.y0,
+      bbox.x1 - bbox.x0,
+      bbox.y1 - bbox.y0
+    );
+    ctx.filter = 'none'; // إعادة التصفية إلى الوضع الافتراضي بعد التطبيق
+  });
+  saveHistory();
+}
+
 
 
 const toggleBoxesBtn = document.getElementById('toggleBoxesBtn');
