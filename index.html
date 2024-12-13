@@ -759,11 +759,16 @@ function startBoxCreation(e) {
             b.y0 !== parseInt(newBox.style.top)
         );
       }
-      toggleEffectsPanel();
+      toggleEffectsPanel(); // تفعيل التأثيرات بعد تحديد المربع
     });
 
     rectangles.push(newBox); // تخزين المربع الجديد
     saveHistory(); // حفظ الحالة الحالية
+
+    // إعادة تطبيق التأثيرات على المربع الجديد
+    if (newBox.classList.contains('selected')) {
+      toggleEffectsPanel();
+    }
 
     // إزالة أحداث السحب
     document.removeEventListener('mousemove', onMove);
@@ -777,6 +782,7 @@ function startBoxCreation(e) {
   document.addEventListener('touchmove', onMove);
   document.addEventListener('touchend', onEnd);
 }
+
 
 
   // Select the Delete button
