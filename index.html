@@ -213,6 +213,10 @@
 
       <!-- Action Bar -->
 <div id="actionBar">
+  <button id="toggleEffectsPanel" class="block w-auto bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600 flex flex-col items-center">
+    <i class="fas fa-sliders-h text-xl"></i> <!-- أيقونة Font Awesome -->
+    <span class="text-sm">Toggle Effects</span> <!-- النص أسفل الأيقونة -->
+  </button>
   <button id="toggleBoxesBtn">
     <i class="fas fa-eye"></i> <!-- أيقونة Show/Hide -->
     <span>Show/Hide</span>
@@ -495,15 +499,16 @@ function extractWords(image) {
   });
 }
 
+document.getElementById('toggleEffectsPanel').addEventListener('click', function() {
+  const effectsPanel = document.getElementById('effectsPanel');
+  // Toggle the visibility of the effects panel
+  if (effectsPanel.classList.contains('hidden')) {
+    effectsPanel.classList.remove('hidden');
+  } else {
+    effectsPanel.classList.add('hidden');
+  }
+});
 
-    // Toggle Effects Panel
-    function toggleEffectsPanel() {
-      if (selectedBoxes.length > 0) {
-        effectsPanel.classList.remove('hidden');
-      } else {
-        effectsPanel.classList.add('hidden');
-      }
-    }
 
     // Apply Effects
     applyBlur.addEventListener('click', () => applyEffect('blur(5px)'));
