@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Text detector with Effects</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@latest/dist/tesseract.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -38,28 +38,61 @@
       overflow-x: auto;
       white-space: nowrap;
     }
-    #actionBar {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80%;
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 25px;
-      padding: 1rem;
-      display: flex;
-      justify-content: space-evenly;
-      align-items: center;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
-      max-width:400px;
-      Gap :5px;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-    #actionBar button {
-      width: auto;
-      flex-shrink: 0;
-    }
+      #actionBar {
+    position: fixed;
+    top: 60px;
+    left: 10px;
+    height: calc(100vh - 75px); /* مع أخذ المسافة العلوية والسفلية بعين الاعتبار */
+    width: 80px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+  }
+
+  #actionBar button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background 0.2s;
+    width: 100%;
+  }
+
+  #actionBar button:hover {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  #actionBar button i {
+    font-size: 24px;
+    color: #333;
+  }
+
+  #actionBar button span {
+    font-size: 12px;
+    color: #333;
+    text-align: center;
+  }
+
+  /* إضافة خاصية Overflow لأزرار كثيرة */
+  #actionBar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  #actionBar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+  }
     .repoCard {
       background: #f7fafc;
       border: 1px solid #e2e8f0;
@@ -109,7 +142,7 @@
     </div>
 
     <!-- Edit Tab -->
-    <div id="tab-edit" class="block">
+    <div id="tab-edit" class="block ml-[40px]">
       <h2 class="text-2xl font-semibold mb-4">upload => Detect text => Effects => Download</h2>
       <div class="mb-4">
         <input type="file" id="imageInput" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
@@ -182,22 +215,40 @@
  </div>
 
       <!-- Action Bar -->
-      <div id="actionBar" class="hidden">
-<button id="toggleBoxesBtn" class="block w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
-  SHOW/HIDE Boxes
-</button>
-<button class="block w-auto bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600" id="stopButton" style="display: none;">Disable Brush</button>
-
-<button id="toggleCreateMode" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">ON/OFF Create BOXES</button>
-  <button id="deleteUnselectedBoxesBtn" class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">
-    Delete Unselected Boxes
+<div id="actionBar">
+  <button id="toggleBoxesBtn">
+    <i class="fas fa-eye"></i> <!-- أيقونة Show/Hide -->
+    <span>Show/Hide</span>
   </button>
-        <button id="undoBtn" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Undo</button>
-        <button id="forwardBtn" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Forward</button>
-        <button id="resetBtn" class="bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600">Reset</button>
-        <button id="downloadBtn" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Download</button>
-      </div>
-    </div>
+  <button id="stopButton">
+    <i class="fas fa-ban"></i> <!-- أيقونة Disable Brush -->
+    <span>Disable Brush</span>
+  </button>
+  <button id="toggleCreateMode">
+    <i class="fas fa-cogs"></i> <!-- أيقونة Create Boxes -->
+    <span>Create Boxes</span>
+  </button>
+  <button id="deleteUnselectedBoxesBtn">
+    <i class="fas fa-trash-alt"></i> <!-- أيقونة Delete Boxes -->
+    <span>Delete Boxes</span>
+  </button>
+  <button id="undoBtn">
+    <i class="fas fa-undo"></i> <!-- أيقونة Undo -->
+    <span>Undo</span>
+  </button>
+  <button id="forwardBtn">
+    <i class="fas fa-redo"></i> <!-- أيقونة Forward -->
+    <span>Forward</span>
+  </button>
+  <button id="resetBtn">
+    <i class="fas fa-sync"></i> <!-- أيقونة Reset -->
+    <span>Reset</span>
+  </button>
+  <button id="downloadBtn">
+    <i class="fas fa-download"></i> <!-- أيقونة Download -->
+    <span>Download</span>
+  </button>
+</div>
 
     <!-- Other Tools Tab -->
     <div id="tab-other-tools" class="hidden">
