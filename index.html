@@ -21,23 +21,17 @@
       border-color: green;
     }
     #effectsPanel {
-      position: fixed;
-      Top: 60px ;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80%;
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 25px;
-      padding: 1rem;
-      
-      
-      align-items: center;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
-      max-width:400px;
-      Gap :5px;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
+    position: fixed;
+    top: 60px;
+    left: 100px;
+    height: calc(100vh - 75px);
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    max-width: 400px;
+}
       #actionBar {
     position: fixed;
     top: 60px;
@@ -129,7 +123,7 @@
   </nav>
 
   <!-- Content -->
-  <div class="mt-16 container mx-auto px-4">
+  <div class="mt-16 container px-2">
     <!-- Extracted Data Tab -->
     <div id="tab-extracted-data" class="hidden">
       <h2 class="text-2xl font-semibold mb-4">Extracted Data</h2>
@@ -155,9 +149,10 @@
       </div>
       
       <!-- Effects Panel -->
-      <div id="effectsPanel" class="hidden h-60 overflow-y-auto bg-gray-100 p-4 rounded shadow-md">
+      <div id="effectsPanel" class="hidden">
         <h3 class="text-lg font-semibold mb-2">Effects Panel</h3>
 
+        <button id="closePanel" class="mt-4 block w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Close Panel</button>
 <div id="colorPalette" class="space-y-2" style="border: 1px solid #ccc; padding: 10px; margin: 10px;">
   <h4 class="font-semibold">Choose Brush Settings</h4>
   <!-- Input لاختيار اللون -->
@@ -213,7 +208,6 @@
 
 
 
-        <button id="closePanel" class="mt-4 block w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Close Panel</button>
       </div>
  </div>
 
