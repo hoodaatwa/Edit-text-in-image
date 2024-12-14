@@ -20,17 +20,31 @@
     .word-box.selected {
       border-color: green;
     }
-    #effectsPanel {
-    position: fixed;
-    top: 60px;
-    left: 100px;
-    height: calc(100vh - 75px);
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
-    padding: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow-y: auto;
-    max-width: 400px;
+#tab-edit {
+  position: relative; /* وضعه بشكل طبيعي داخل الصفحة */
+  transition: margin-left 0.3s ease; /* تأثير الحركة عند إضافة/إخفاء #effectsPanel */
+}
+
+#effectsPanel {
+  position: fixed;
+  top: 60px;
+  left: 100px;
+  height: calc(100vh - 75px);
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  max-width: 400px;
+  display: none; /* إخفاء اللوحة بشكل افتراضي */
+}
+
+#effectsPanel.show {
+  display: block; /* إظهار اللوحة عندما نضيف الكلاس .show */
+}
+
+#tab-edit.with-effects {
+  margin-left: 400px; /* المسافة التي يجب أن يتحرك إليها عند ظهور اللوحة */
 }
       #actionBar {
     position: fixed;
@@ -152,7 +166,7 @@
       <div id="effectsPanel" class="hidden">
         <h3 class="text-lg font-semibold mb-2">Effects Panel</h3>
 
-        <button id="closePanel" class="mt-4 block w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Close Panel</button>
+       
 <div id="colorPalette" class="space-y-2" style="border: 1px solid #ccc; padding: 10px; margin: 10px;">
   <h4 class="font-semibold">Choose Brush Settings</h4>
   <!-- Input لاختيار اللون -->
@@ -274,7 +288,6 @@
   const applyBlur = document.getElementById('applyBlur');
   const applyGrayscale = document.getElementById('applyGrayscale');
   const applyBrightness = document.getElementById('applyBrightness');
-  const closePanel = document.getElementById('closePanel');
   const undoBtn = document.getElementById('undoBtn');
   const forwardBtn = document.getElementById('forwardBtn');
   const resetBtn = document.getElementById('resetBtn');
@@ -496,6 +509,30 @@ function extractWords(image) {
     });
   });
 }
+
+
+
+
+
+
+document.getElementById('toggleEffectsPanel').addEventListener('click', function() {
+  const effectsPanel = document.getElementById('effectsPanel');
+  const tabEdit = document.getElementById('tab-edit');
+  
+  // تغيير إظهار/إخفاء اللوحة
+  effectsPanel.classList.toggle('show');
+  
+  // إضافة/إزالة المسافة من #tab-edit
+  tabEdit.classList.toggle('with-effects');
+});
+
+
+
+
+
+
+
+
 
 document.getElementById('toggleEffectsPanel').addEventListener('click', function() {
   const effectsPanel = document.getElementById('effectsPanel');
@@ -800,10 +837,7 @@ toggleBoxesBtn.addEventListener('click', () => {
       ctx.putImageData(state, 0, 0);
     }
 
-    // Close Effects Panel
-    closePanel.addEventListener('click', () => {
-      effectsPanel.classList.add('hidden');
-    });
+
 
 
 let createMode = false; // الحالة الافتراضية لوضع الإنشاء
