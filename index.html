@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@latest/dist/tesseract.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+<!-- إضافة مكتبة CropperJS -->
+<link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.min.css">
+<script src="https://unpkg.com/cropperjs/dist/cropper.min.js"></script>
+
   <style>
     #image-container {
       position: relative;
@@ -251,24 +255,20 @@
        
 <div id="colorPalette" class="space-y-2" style="border: 1px solid #ccc; padding: 10px; margin: 10px;">
   <h4 class="font-semibold">Choose Brush Settings</h4>
-  <!-- Input لاختيار اللون -->
   <input type="color" id="colorPicker" class="w-16 h-16 cursor-pointer border-2 border-gray-300" />
   
-  <!-- Input لاختيار حجم الفرشاة -->
   <div>
     <label for="brushSize" class="block">Brush Size</label>
     <input type="range" id="brushSize" min="5" max="30" value="10" class="w-auto border-2 border-gray-300" />
     <span id="brushSizeValue" class="text-sm">10</span>
   </div>
   
-  <!-- Input لاختيار الشفافية -->
   <div>
     <label for="brushOpacity" class="block">Opacity</label>
     <input type="range" id="brushOpacity" min="0" max="1" step="0.1" value="1" class="w-auto border-2 border-gray-300" />
     <span id="brushOpacityValue" class="text-lg">1</span>
   </div>
   
-  <!-- نوع الفرشاة -->
   <div>
     <label for="brushType" class="block">Brush Type</label>
     <select id="brushType" class="w-full border-2 border-gray-300">
@@ -276,7 +276,24 @@
       <option value="square">Square</option>
     </select>
   </div>
+
+  <!-- Input لاختيار صورة الفرشاة -->
+  <div>
+    <label for="imageBrush" class="block">Choose Image Brush</label>
+    <input type="file" id="imageBrush" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+  </div>
+  
+  <!-- المكان الذي يتم فيه عرض الصورة لاقتصاصها -->
+  <div id="crop-container" style="display:none;">
+    <img id="image-to-crop" src="" alt="Image for cropping">
+<button id="save-cropped-image">Save Cropped Image</button>
+<!-- زر لإعادة استخدام الصورة كفرشاة بعد تعطيلها -->
+
+  </div>
+<button id="reuseBrushImage" style="display:none;" class="bg-blue-500 text-white px-4 py-2 rounded">Reuse Brush Image</button>
+
 </div>
+
 
         <div class="space-y-2" style="border: 1px solid #ccc; padding: 10px; margin: 10px;">
           <button id="applyBlur" class="block w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Apply Blur</button>
@@ -712,9 +729,10 @@ removeColorBtn.addEventListener('click', () => {
 // استخدام ColorThief لاستخراج الألوان من الصورة
 // دالة لاختيار اللون من input
 let selectedColor = null;
-let brushSize = 10; // حجم الفرشاة
-let brushOpacity = 1; // الشفافية
-let brushType = 'circle'; // نوع الفرشاة
+let brushSize = 10;
+let brushOpacity = 1;
+let brushType = 'circle';
+let brushImage = null;
 
 const colorPicker = document.getElementById('colorPicker');
 const brushSizeInput = document.getElementById('brushSize');
@@ -722,20 +740,24 @@ const brushSizeValue = document.getElementById('brushSizeValue');
 const brushOpacityInput = document.getElementById('brushOpacity');
 const brushOpacityValue = document.getElementById('brushOpacityValue');
 const brushTypeSelect = document.getElementById('brushType');
+const imageBrushInput = document.getElementById('imageBrush');
+const cropContainer = document.getElementById('crop-container');
+const imageToCrop = document.getElementById('image-to-crop');
+const reuseBrushImageButton = document.getElementById('reuseBrushImage');
 
-// تحديث حجم الفرشاة عند تغيير القيمة
+// تحديث حجم الفرشاة
 brushSizeInput.addEventListener('input', (event) => {
   brushSize = event.target.value;
   brushSizeValue.textContent = brushSize;
 });
 
-// تحديث الشفافية عند تغيير القيمة
+// تحديث الشفافية
 brushOpacityInput.addEventListener('input', (event) => {
   brushOpacity = event.target.value;
   brushOpacityValue.textContent = brushOpacity;
 });
 
-// تحديث نوع الفرشاة عند تغيير القيمة
+// تحديث نوع الفرشاة
 brushTypeSelect.addEventListener('change', (event) => {
   brushType = event.target.value;
 });
@@ -743,10 +765,57 @@ brushTypeSelect.addEventListener('change', (event) => {
 // اختيار اللون
 colorPicker.addEventListener('input', (event) => {
   const color = event.target.value;
-  selectedColor = hexToRgb(color); // تحويل اللون من hex إلى RGB
-  console.log('Selected Color:', selectedColor);
+  selectedColor = hexToRgb(color);
   activateBrush();
   toggleStopButton(true);
+});
+
+// تحميل صورة الفرشاة
+imageBrushInput.addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        // إخفاء واجهة اختيار صورة الفرشاة
+        imageBrushInput.style.display = 'none';
+        cropContainer.style.display = 'block';
+        imageToCrop.src = e.target.result;
+
+        // تفعيل CropperJS لاقتصاص الصورة مع خصائص إضافية
+  const cropper = new Cropper(imageToCrop, {
+  aspectRatio: 1,          // تحديد نسبة العرض إلى الارتفاع
+  viewMode: 1,             // وضع العرض (يمكنك تغييره إلى 0 أو 2)
+  preview: '.preview',     // معاينة اقتصاص الصورة في مكان آخر
+  dragMode: 'move',        // التحكم في سحب الصورة داخل مربع الاقتصاص
+  cropBoxResizable: true,  // تمكين إعادة تحجيم مربع الاقتصاص
+  rotatable: true,         // تمكين تدوير الصورة
+  scalable: true,          // تمكين تغيير حجم الصورة
+  zoomable: true,          // تمكين التكبير والتصغير
+  movable: true,           // تمكين تحريك الصورة داخل مربع الاقتصاص
+  responsive: true,        // تحسين الاستجابة لمقاسات الشاشات المختلفة
+  autoCropArea: 0.8,       // تحديد مساحة الاقتصاص التلقائي (من 0 إلى 1)
+  toggleDragModeOnDblclick: true, // تغيير وضع السحب عند النقر المزدوج
+        });
+
+        // حفظ الصورة بعد اقتصاصها
+        document.getElementById('save-cropped-image').addEventListener('click', () => {
+          const canvas = cropper.getCroppedCanvas();
+          brushImage = new Image();
+          brushImage.src = canvas.toDataURL(); // استخدام الصورة المقتصة كفرشاة
+          activateBrush();
+          toggleStopButton(true);
+
+          // إخفاء واجهة الاقتصاص
+          cropContainer.style.display = 'none';
+          reuseBrushImageButton.style.display = 'block'; // إظهار زر إعادة استخدام الفرشاة
+        });
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
 });
 
 // تحويل اللون من Hex إلى RGB
@@ -757,15 +826,12 @@ function hexToRgb(hex) {
   return [r, g, b];
 }
 
-// إضافة زر لإيقاف الفرشاة
 const stopButton = document.getElementById('stopButton');
-
-// إضافة حدث الزر لإيقاف الفرشاة
 stopButton.addEventListener('click', stopBrush);
 
 // تفعيل الفرشاة
 function activateBrush() {
-  if (!selectedColor) return;
+  if (!(selectedColor || brushImage)) return;
   imageCanvas.addEventListener('mousedown', startDrawing);
   imageCanvas.addEventListener('mousemove', draw);
   imageCanvas.addEventListener('mouseup', stopDrawing);
@@ -775,48 +841,65 @@ function activateBrush() {
 let drawing = false;
 
 function startDrawing(event) {
-  if (!selectedColor) return;
+  if (!(selectedColor || brushImage)) return;
   drawing = true;
   draw(event);
 }
 
 function draw(event) {
-  if (!drawing || !selectedColor) return;
-
+  if (!drawing || !(selectedColor || brushImage)) return;
   const x = event.offsetX;
   const y = event.offsetY;
 
-  ctx.fillStyle = `rgba(${selectedColor[0]}, ${selectedColor[1]}, ${selectedColor[2]}, ${brushOpacity})`; // إضافة الشفافية
-  ctx.beginPath();
-  if (brushType === 'circle') {
-    ctx.arc(x, y, brushSize, 0, 2 * Math.PI); // رسم دائرة
-  } else {
-    ctx.rect(x - brushSize / 2, y - brushSize / 2, brushSize, brushSize); // رسم مربع
+  if (selectedColor) {
+    ctx.fillStyle = `rgba(${selectedColor[0]}, ${selectedColor[1]}, ${selectedColor[2]}, ${brushOpacity})`;
+    ctx.beginPath();
+    if (brushType === 'circle') {
+      ctx.arc(x, y, brushSize, 0, 2 * Math.PI); 
+    } else {
+      ctx.rect(x - brushSize / 2, y - brushSize / 2, brushSize, brushSize);
+    }
+    ctx.fill();
+  } else if (brushImage) {
+    ctx.globalAlpha = brushOpacity;
+    ctx.drawImage(brushImage, x - brushSize / 2, y - brushSize / 2, brushSize, brushSize);
   }
-  ctx.fill();
 }
 
 function stopDrawing() {
   drawing = false;
 }
 
-// دالة لإيقاف الفرشاة
 function stopBrush() {
-  drawing = false; // إيقاف الرسم
+  drawing = false;
   imageCanvas.removeEventListener('mousedown', startDrawing);
   imageCanvas.removeEventListener('mousemove', draw);
   imageCanvas.removeEventListener('mouseup', stopDrawing);
   imageCanvas.removeEventListener('mouseout', stopDrawing);
-  console.log('Brush stopped');
-
-  // إخفاء زر إيقاف الفرشاة بعد التوقف
   toggleStopButton(false);
+  reuseBrushImageButton.style.display = 'block'; // إخفاء زر إعادة الاستخدام
 }
 
-// دالة لتغيير حالة زر إيقاف الفرشاة بين الظهور والإخفاء
 function toggleStopButton(show) {
   stopButton.style.display = show ? 'block' : 'none';
 }
+
+// إعادة استخدام صورة الفرشاة بعد تعطيلها
+reuseBrushImageButton.addEventListener('click', () => {
+  if (brushImage) {
+    activateBrush(); // إعادة تفعيل الفرشاة باستخدام الصورة
+    toggleStopButton(true);
+    reuseBrushImageButton.style.display = 'block'; // إخفاء الزر بعد إعادة التفعيل
+  }
+});
+
+
+
+
+
+
+
+
 
 
 
