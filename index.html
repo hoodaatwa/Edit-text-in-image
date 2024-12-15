@@ -44,7 +44,7 @@
 }
 
 #tab-edit.with-effects {
-  margin-left: 400px; /* المسافة التي يجب أن يتحرك إليها عند ظهور اللوحة */
+    margin-left: 25rem;
 }
       #actionBar {
     position: fixed;
@@ -101,6 +101,88 @@
     /* إضافة margin-left لضبط المسافة بين #tab-edit و #actionBar */
     margin-left: calc(80px + 10px); /* 80px هو عرض الـ actionBar و 10px هي المسافة بينهما */
   }
+
+
+
+
+
+
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  html {
+    font-size: 16px; /* الحجم الافتراضي */
+  }
+  i {
+  font-size: 1.5em;
+  }
+  #actionBar {
+    width: 80px; /* عرض متوسط */
+  }
+
+  #actionBar button i {
+    font-size: 20px; /* أيقونات متوسطة الحجم */
+  }
+
+  #actionBar button span {
+    font-size: 12px; /* تكبير النص قليلاً */
+  }
+  #effectsPanel {
+    height: 100%; /* ملء الارتفاع بالكامل */
+    left: 6.2rem;
+  }
+  #effectsPanel {
+    max-width: 400px; /* توسيع اللوحة الجانبية */
+  }
+}
+@media (min-width: 1025px) {
+  html {
+    font-size: 18px; /* تكبير النصوص */
+  }
+  i {
+  font-size: 3.5em;
+  }
+    #tab-edit {
+    margin-left: 6rem;
+  }
+  #actionBar {
+    width: 100px; /* عرض أكبر */
+  }
+
+  #actionBar button i {
+    font-size: 33px; /* أيقونات كبيرة */
+  }
+
+  #actionBar button span {
+    font-size: 17px; /* نص أكبر */
+  }
+  button span {
+    font-size: 17px; /* نص أكبر */
+  }
+  span {
+    font-size: 17px; /* نص أكبر */
+  }
+  #effectsPanel {
+    max-width: 600px; /* لوحة عريضة */
+   left: 6.2rem;
+  }
+  #tab-edit.with-effects {
+    margin-left: 24rem;
+}
+  #image-container {
+    max-width: 90%; /* توسيع عرض الصور */
+    margin: 0 auto; /* التوسيط */
+  }
+}
+
+
+
+
+
+
+
+
+
+
     .repoCard {
       background: #f7fafc;
       border: 1px solid #e2e8f0;
@@ -158,6 +240,7 @@
       <div class="mb-4">
         <input type="file" id="imageInput" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
       </div>
+      
       <div id="image-container">
         <canvas id="imageCanvas" class="shadow border"></canvas>
       </div>
