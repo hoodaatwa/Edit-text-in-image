@@ -259,7 +259,7 @@
   
   <div>
     <label for="brushSize" class="block">Brush Size</label>
-    <input type="range" id="brushSize" min="1" max="30" value="10" class="w-auto border-2 border-gray-300" />
+    <input type="range" id="brushSize" min="5" max="30" value="10" class="w-auto border-2 border-gray-300" />
     <span id="brushSizeValue" class="text-sm">10</span>
   </div>
   
@@ -279,7 +279,7 @@
 
   <!-- Input لاختيار صورة الفرشاة -->
   <div>
-    <label for="imageBrush" class="block">Choose Image Brush</label>
+    <label class="block">Choose Image Brush</label>
     <input type="file" id="imageBrush" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
   </div>
   
@@ -290,7 +290,9 @@
 <!-- زر لإعادة استخدام الصورة كفرشاة بعد تعطيلها -->
 
   </div>
-<button id="reuseBrushImage" style="display:none;" class="bg-blue-500 text-white px-4 py-2 rounded">Reuse Brush Image</button>
+<!-- إضافة زر جديد لإعادة استخدام الفرشاة بالصورة -->
+<button id="reuseBrushImageOnlyButton" style="display:none;" class="bg-blue-500 text-white px-4 py-2 rounded">Reuse Brush Image</button>
+
 
 </div>
 
@@ -743,7 +745,7 @@ const brushTypeSelect = document.getElementById('brushType');
 const imageBrushInput = document.getElementById('imageBrush');
 const cropContainer = document.getElementById('crop-container');
 const imageToCrop = document.getElementById('image-to-crop');
-const reuseBrushImageButton = document.getElementById('reuseBrushImage');
+const reuseBrushImageOnlyButton = document.getElementById('reuseBrushImageOnlyButton'); // زر
 
 // تحديث حجم الفرشاة
 brushSizeInput.addEventListener('input', (event) => {
@@ -809,7 +811,8 @@ imageBrushInput.addEventListener('change', (event) => {
 
           // إخفاء واجهة الاقتصاص
           cropContainer.style.display = 'none';
-          reuseBrushImageButton.style.display = 'block'; // إظهار زر إعادة استخدام الفرشاة
+          reuseBrushImageOnlyButton.style.display = 'block'; // إظهار زر إعادة استخدام فرشاة الصورة فقط
+
         });
       };
       img.src = e.target.result;
@@ -877,24 +880,29 @@ function stopBrush() {
   imageCanvas.removeEventListener('mouseup', stopDrawing);
   imageCanvas.removeEventListener('mouseout', stopDrawing);
   toggleStopButton(false);
-  reuseBrushImageButton.style.display = 'block'; // إخفاء زر إعادة الاستخدام
+  reuseBrushImageOnlyButton.style.display = 'block'; // إظهار زر إعادة استخدام فرشاة الصورة فقط
+
 }
 
 function toggleStopButton(show) {
   stopButton.style.display = show ? 'block' : 'none';
 }
 
-// إعادة استخدام صورة الفرشاة بعد تعطيلها
-reuseBrushImageButton.addEventListener('click', () => {
+
+// إظهار أو إخفاء زر إيقاف الفرشاة
+function toggleStopButton(show) {
+  stopButton.style.display = show ? 'block' : 'none';
+}
+
+// إعادة استخدام فرشاة الصورة فقط عند الضغط على الزر الجديد
+reuseBrushImageOnlyButton.addEventListener('click', () => {
   if (brushImage) {
-    activateBrush(); // إعادة تفعيل الفرشاة باستخدام الصورة
+    selectedColor = null; // إلغاء اللون المحدد
+    activateBrush(); // تفعيل الفرشاة باستخدام الصورة فقط
     toggleStopButton(true);
-    reuseBrushImageButton.style.display = 'block'; // إخفاء الزر بعد إعادة التفعيل
+    reuseBrushImageOnlyButton.style.display = 'none'; // إخفاء الزر بعد إعادة التفعيل
   }
 });
-
-
-
 
 
 
