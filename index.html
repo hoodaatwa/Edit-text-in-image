@@ -89,11 +89,11 @@
   }
 
   /* إضافة خاصية Overflow لأزرار كثيرة */
-  #actionBar::-webkit-scrollbar {
+  #actionBar::-webkit-scrollbar ,#effectsPanel::-webkit-scrollbar{
     width: 6px;
   }
 
-  #actionBar::-webkit-scrollbar-thumb {
+  #actionBar::-webkit-scrollbar-thumb ,#effectsPanel::-webkit-scrollbar-thumb{
     background: rgba(0, 0, 0, 0.3);
     border-radius: 5px;
   }
@@ -127,7 +127,6 @@
     font-size: 12px; /* تكبير النص قليلاً */
   }
   #effectsPanel {
-    height: 100%; /* ملء الارتفاع بالكامل */
     left: 6.2rem;
   }
   #effectsPanel {
