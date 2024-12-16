@@ -735,6 +735,7 @@ let brushSize = 10;
 let brushOpacity = 1;
 let brushType = 'circle';
 let brushImage = null;
+let cropper = null;
 
 const colorPicker = document.getElementById('colorPicker');
 const brushSizeInput = document.getElementById('brushSize');
@@ -745,7 +746,8 @@ const brushTypeSelect = document.getElementById('brushType');
 const imageBrushInput = document.getElementById('imageBrush');
 const cropContainer = document.getElementById('crop-container');
 const imageToCrop = document.getElementById('image-to-crop');
-const reuseBrushImageOnlyButton = document.getElementById('reuseBrushImageOnlyButton'); // زر
+const reuseBrushImageOnlyButton = document.getElementById('reuseBrushImageOnlyButton'); // زر جديد
+
 
 // تحديث حجم الفرشاة
 brushSizeInput.addEventListener('input', (event) => {
@@ -770,6 +772,8 @@ colorPicker.addEventListener('input', (event) => {
   selectedColor = hexToRgb(color);
   activateBrush();
   toggleStopButton(true);
+  reuseBrushImageOnlyButton.style.display = 'block'; // إظهار زر إعادة استخدام فرشاة الصورة فقط
+
 });
 
 // تحميل صورة الفرشاة
@@ -781,24 +785,20 @@ imageBrushInput.addEventListener('change', (event) => {
       const img = new Image();
       img.onload = () => {
         // إخفاء واجهة اختيار صورة الفرشاة
-        imageBrushInput.style.display = 'none';
         cropContainer.style.display = 'block';
         imageToCrop.src = e.target.result;
 
-        // تفعيل CropperJS لاقتصاص الصورة مع خصائص إضافية
-  const cropper = new Cropper(imageToCrop, {
-  aspectRatio: 1,          // تحديد نسبة العرض إلى الارتفاع
-  viewMode: 1,             // وضع العرض (يمكنك تغييره إلى 0 أو 2)
-  preview: '.preview',     // معاينة اقتصاص الصورة في مكان آخر
-  dragMode: 'move',        // التحكم في سحب الصورة داخل مربع الاقتصاص
-  cropBoxResizable: true,  // تمكين إعادة تحجيم مربع الاقتصاص
-  rotatable: true,         // تمكين تدوير الصورة
-  scalable: true,          // تمكين تغيير حجم الصورة
-  zoomable: true,          // تمكين التكبير والتصغير
-  movable: true,           // تمكين تحريك الصورة داخل مربع الاقتصاص
-  responsive: true,        // تحسين الاستجابة لمقاسات الشاشات المختلفة
-  autoCropArea: 0.8,       // تحديد مساحة الاقتصاص التلقائي (من 0 إلى 1)
-  toggleDragModeOnDblclick: true, // تغيير وضع السحب عند النقر المزدوج
+        // إذا كان هناك كائن Cropper موجود مسبقًا، قم بتدميره
+        if (cropper) {
+          cropper.destroy();
+        }
+
+        // تفعيل CropperJS لاقتصاص الصورة
+        cropper = new Cropper(imageToCrop, {
+          viewMode: 1,
+          autoCropArea: 1,
+          movable: true,
+          zoomable: true,
         });
 
         // حفظ الصورة بعد اقتصاصها
@@ -809,10 +809,10 @@ imageBrushInput.addEventListener('change', (event) => {
           activateBrush();
           toggleStopButton(true);
 
-          // إخفاء واجهة الاقتصاص
+          // إعادة تمكين واجهة اختيار صورة الفرشاة
           cropContainer.style.display = 'none';
-          reuseBrushImageOnlyButton.style.display = 'block'; // إظهار زر إعادة استخدام فرشاة الصورة فقط
-
+          imageBrushInput.value = ''; // تصفير مدخل الملف لإتاحة اختيار نفس الصورة مجددًا
+          reuseBrushImageOnlyButton.style.display = 'none'; // إظهار زر إعادة استخدام فرشاة الصورة فقط
         });
       };
       img.src = e.target.result;
@@ -828,9 +828,6 @@ function hexToRgb(hex) {
   const b = parseInt(hex.slice(5, 7), 16);
   return [r, g, b];
 }
-
-const stopButton = document.getElementById('stopButton');
-stopButton.addEventListener('click', stopBrush);
 
 // تفعيل الفرشاة
 function activateBrush() {
@@ -873,23 +870,6 @@ function stopDrawing() {
   drawing = false;
 }
 
-function stopBrush() {
-  drawing = false;
-  imageCanvas.removeEventListener('mousedown', startDrawing);
-  imageCanvas.removeEventListener('mousemove', draw);
-  imageCanvas.removeEventListener('mouseup', stopDrawing);
-  imageCanvas.removeEventListener('mouseout', stopDrawing);
-  toggleStopButton(false);
-  reuseBrushImageOnlyButton.style.display = 'block'; // إظهار زر إعادة استخدام فرشاة الصورة فقط
-
-}
-
-function toggleStopButton(show) {
-  stopButton.style.display = show ? 'block' : 'none';
-}
-
-
-// إظهار أو إخفاء زر إيقاف الفرشاة
 function toggleStopButton(show) {
   stopButton.style.display = show ? 'block' : 'none';
 }
@@ -903,6 +883,19 @@ reuseBrushImageOnlyButton.addEventListener('click', () => {
     reuseBrushImageOnlyButton.style.display = 'none'; // إخفاء الزر بعد إعادة التفعيل
   }
 });
+stopButton.addEventListener('click', stopBrush);
+
+function stopBrush() {
+  drawing = false; // تعطيل الرسم
+  imageCanvas.removeEventListener('mousedown', startDrawing);
+  imageCanvas.removeEventListener('mousemove', draw);
+  imageCanvas.removeEventListener('mouseup', stopDrawing);
+  imageCanvas.removeEventListener('mouseout', stopDrawing);
+  toggleStopButton(false); // إخفاء زر الإيقاف
+  reuseBrushImageOnlyButton.style.display = 'block'; // إظهار زر إعادة استخدام فرشاة الصورة فقط
+
+}
+
 
 
 
