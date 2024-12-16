@@ -795,10 +795,16 @@ imageBrushInput.addEventListener('change', (event) => {
 
         // تفعيل CropperJS لاقتصاص الصورة
         cropper = new Cropper(imageToCrop, {
-          viewMode: 1,
-          autoCropArea: 1,
-          movable: true,
-          zoomable: true,
+            viewMode: 1,
+            autoCropArea: 1,
+            movable: true,
+            rotatable: false,
+            scalable: false,
+            zoomable: true,
+            autoCrop: true,
+            autoCropArea: 1,
+            resizable: false, // يمكنك تغييره حسب الحاجة
+
         });
 
         // حفظ الصورة بعد اقتصاصها
