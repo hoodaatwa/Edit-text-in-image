@@ -291,7 +291,7 @@
 
   </div>
 <!-- إضافة زر جديد لإعادة استخدام الفرشاة بالصورة -->
-<button id="reuseBrushImageOnlyButton" style="display:none;" class="bg-blue-500 text-white px-4 py-2 rounded">Reuse Brush Image</button>
+<button id="reuseBrushImageOnlyButton" style="display:none;" class="block w-full bg-blue-500 text-white px-4 py-2 rounded">USE Brush Image</button>
 
 
 </div>
@@ -770,11 +770,19 @@ brushTypeSelect.addEventListener('change', (event) => {
 colorPicker.addEventListener('input', (event) => {
   const color = event.target.value;
   selectedColor = hexToRgb(color);
+
   activateBrush();
   toggleStopButton(true);
-  reuseBrushImageOnlyButton.style.display = 'block'; // إظهار زر إعادة استخدام فرشاة الصورة فقط
 
+  // لا يظهر زر إعادة استخدام فرشاة الصورة إذا لم تكن هناك صورة مقتصة
+  if (brushImage) {
+    reuseBrushImageOnlyButton.style.display = 'block';
+
+  } else {
+    reuseBrushImageOnlyButton.style.display = 'none';
+  }
 });
+
 
 // تحميل صورة الفرشاة
 imageBrushInput.addEventListener('change', (event) => {
@@ -819,7 +827,7 @@ imageBrushInput.addEventListener('change', (event) => {
           // إعادة تمكين واجهة اختيار صورة الفرشاة
           cropContainer.style.display = 'none';
           imageBrushInput.value = ''; // تصفير مدخل الملف لإتاحة اختيار نفس الصورة مجددًا
-          reuseBrushImageOnlyButton.style.display = 'none'; // إظهار زر إعادة استخدام فرشاة الصورة فقط
+          reuseBrushImageOnlyButton.style.display = 'block'; // إظهار زر إعادة استخدام فرشاة الصورة فقط
         });
       };
       img.src = e.target.result;
@@ -899,8 +907,8 @@ function stopBrush() {
   imageCanvas.removeEventListener('mouseup', stopDrawing);
   imageCanvas.removeEventListener('mouseout', stopDrawing);
   toggleStopButton(false); // إخفاء زر الإيقاف
-  reuseBrushImageOnlyButton.style.display = 'block'; // إظهار زر إعادة استخدام فرشاة الصورة فقط
-
+  stopButton.style.display = 'none';
+  reuseBrushImageOnlyButton.style.display = brushImage ? 'block' : 'none';
 }
 
 
