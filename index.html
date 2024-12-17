@@ -787,7 +787,8 @@ imageBrushInput.addEventListener('change', (event) => {
         // إخفاء واجهة اختيار صورة الفرشاة
         cropContainer.style.display = 'block';
         imageToCrop.src = e.target.result;
-
+        reuseBrushImageOnlyButton.style.display = 'none'; // إظهار زر إعادة استخدام فرشاة الصورة فقط
+      
         // إذا كان هناك كائن Cropper موجود مسبقًا، قم بتدميره
         if (cropper) {
           cropper.destroy();
