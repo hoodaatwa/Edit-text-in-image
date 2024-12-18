@@ -48,7 +48,7 @@
 }
 
 #tab-edit.with-effects {
-    margin-left: 26.5rem;
+    margin-left: 27.5rem;
 }
       #actionBar {
     position: fixed;
@@ -103,7 +103,7 @@
   }
    #tab-edit {
     /* إضافة margin-left لضبط المسافة بين #tab-edit و #actionBar */
-    margin-left: calc(80px + 10px); /* 80px هو عرض الـ actionBar و 10px هي المسافة بينهما */
+    margin-left: 6.5rem;
   }
 
 
@@ -144,9 +144,7 @@
   i {
   font-size: 3.5em;
   }
-    #tab-edit {
-    margin-left: 6rem;
-  }
+
   #actionBar {
     width: 100px; /* عرض أكبر */
   }
@@ -166,10 +164,10 @@
   }
   #effectsPanel {
     max-width: 600px; /* لوحة عريضة */
-   left: 6.2rem;
+   left: 6.5rem;
   }
   #tab-edit.with-effects {
-    margin-left: 26.5rem;
+    margin-left: 27.5rem;
 }
   #image-container {
     max-width: 90%; /* توسيع عرض الصور */
@@ -238,7 +236,7 @@
     </div>
 
     <!-- Edit Tab -->
-    <div id="tab-edit" class="block ml-[40px]">
+    <div id="tab-edit" class="block">
       <h2 class="text-2xl font-semibold mb-4">upload => Detect text => Effects => Download</h2>
       <div class="mb-4">
         <input type="file" id="imageInput" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
@@ -337,7 +335,7 @@
     <span>Show/Hide BOXES</span>
   </button>
   <button id="stopButton" style="display: none;">
-    <i class="fas fa-hand-paper"></i> <!-- أيقونة Disable Brush -->
+    <i class="fas fa-hand-paper" style="color: #f44336;"></i> <!-- أيقونة Disable Brush -->
     <span>Disable Brush</span>
   </button>
   <button id="toggleCreateMode">
