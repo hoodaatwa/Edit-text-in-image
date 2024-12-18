@@ -107,11 +107,6 @@
   }
 
 
-
-
-
-
-
 @media (min-width: 601px) and (max-width: 1024px) {
   html {
     font-size: 16px; /* الحجم الافتراضي */
@@ -176,14 +171,6 @@
 }
 
 
-
-
-
-
-
-
-
-
     .repoCard {
       background: #f7fafc;
       border: 1px solid #e2e8f0;
@@ -239,7 +226,7 @@
     <div id="tab-edit" class="block">
       <h2 class="text-2xl font-semibold mb-4">upload => Detect text => Effects => Download</h2>
       <div class="mb-4">
-        <input type="file" id="imageInput" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+        <input type="file" id="imageInput" accept="image/*" class="block w-auto text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
       </div>
       
       <div id="image-container">
@@ -319,11 +306,6 @@
 
 <button id="removeColorBtn" class="block w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Remove and Replace Color</button>
 </div>
-
-       
-
-
-
       </div>
  </div>
 
@@ -614,9 +596,6 @@ function extractWords(image) {
 
 
 
-
-
-
 document.getElementById('toggleEffectsPanel').addEventListener('click', function() {
   const effectsPanel = document.getElementById('effectsPanel');
   const tabEdit = document.getElementById('tab-edit');
@@ -627,12 +606,6 @@ document.getElementById('toggleEffectsPanel').addEventListener('click', function
   // إضافة/إزالة المسافة من #tab-edit
   tabEdit.classList.toggle('with-effects');
 });
-
-
-
-
-
-
 
 
 
@@ -1105,8 +1078,6 @@ function startCreateBox(e) {
   document.addEventListener('touchmove', onMove);
   document.addEventListener('touchend', onEnd);
 }
-
-
 
 
   // Select the Delete button
