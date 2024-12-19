@@ -169,6 +169,10 @@
     margin: 0 auto; /* التوسيط */
   }
 }
+#image-container {
+  transition: transform 0.3s ease; /* تأثير سلس عند تغيير الحجم */
+  max-width: 100%; /* ضمان عدم تجاوز العنصر العرض */
+}
 
 
     .repoCard {
@@ -314,6 +318,10 @@
   <button id="toggleEffectsPanel" class="block w-auto bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600 flex flex-col items-center">
     <i class="fas fa-cogs"></i> <!-- أيقونة Font Awesome -->
     <span class="text-sm">Toggle Effects Panel</span> <!-- النص أسفل الأيقونة -->
+  </button>
+    <button id="toggleZoomBtn">
+    <i class="fas fa-search-plus"></i>
+    <span>Adjust Zoom</span>
   </button>
   <button id="toggleBoxesBtn">
     <i class="fas fa-eye"></i> <!-- أيقونة Show/Hide -->
@@ -606,6 +614,117 @@ document.getElementById('toggleEffectsPanel').addEventListener('click', function
   // إضافة/إزالة المسافة من #tab-edit
   tabEdit.classList.toggle('with-effects');
 });
+
+
+
+
+
+
+
+
+
+
+
+
+  let adjustZoomEnabled = true; // التحكم في حالة adjustZoom
+
+  function adjustZoom() {
+    const container = document.getElementById("image-container");
+    const canvas = document.getElementById("imageCanvas");
+
+    if (!adjustZoomEnabled) {
+      container.style.transform = "scale(1)";
+      container.style.transformOrigin = "top left";
+      return;
+    }
+
+    const containerWidth = container.offsetWidth;
+    const canvasWidth = canvas.offsetWidth;
+
+    if (canvasWidth > containerWidth) {
+      const scale = containerWidth / canvasWidth;
+      container.style.transform = `scale(${scale})`;
+      container.style.transformOrigin = "top left";
+    } else {
+      container.style.transform = "scale(1)";
+    }
+  }
+
+  document.getElementById("imageInput").addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+          const canvas = document.getElementById("imageCanvas");
+          const ctx = canvas.getContext("2d");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0, img.width, img.height);
+
+          // استدعاء ضبط التكبير
+          adjustZoom();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // تحديث التكبير عند تغيير حجم النافذة
+  window.addEventListener("resize", adjustZoom);
+
+  // زر Toggle لإيقاف أو تفعيل adjustZoom
+  document.getElementById("toggleZoomBtn").addEventListener("click", function () {
+    adjustZoomEnabled = !adjustZoomEnabled; // تبديل حالة adjustZoom
+    adjustZoom(); // تحديث العرض بناءً على الحالة الجديدة
+
+    // تحديث نص الزر
+    this.querySelector("span").textContent = adjustZoomEnabled ? "Enable Zoom" : "Disable Zoom";
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1011,13 +1130,16 @@ imageContainer.addEventListener('touchstart', startCreateBox);
 function startCreateBox(e) {
   if (!createMode) return;
 
-  // التعامل مع الأحداث اللمسية
-  e.preventDefault();  // لمنع سلوكيات افتراضية مثل التمرير
+  e.preventDefault(); // لمنع السلوك الافتراضي
 
-  // تسجيل نقطة البداية
   const rect = imageContainer.getBoundingClientRect();
-  startX = e.clientX ? e.clientX - rect.left : e.touches[0].clientX - rect.left;
-  startY = e.clientY ? e.clientY - rect.top : e.touches[0].clientY - rect.top;
+
+  // حساب نسبة التصغير
+  const scale = parseFloat(window.getComputedStyle(imageContainer).transform.split(',')[0].replace('matrix(', '')) || 1;
+
+  // تسجيل نقطة البداية مع الأخذ بالاعتبار نسبة التصغير
+  startX = (e.clientX ? e.clientX - rect.left : e.touches[0].clientX - rect.left) / scale;
+  startY = (e.clientY ? e.clientY - rect.top : e.touches[0].clientY - rect.top) / scale;
 
   // إنشاء مربع مؤقت
   const newBox = document.createElement('div');
@@ -1031,8 +1153,8 @@ function startCreateBox(e) {
 
   // متابعة السحب لتحديد أبعاد المربع
   const onMove = (moveEvent) => {
-    const currentX = moveEvent.clientX ? moveEvent.clientX - rect.left : moveEvent.touches[0].clientX - rect.left;
-    const currentY = moveEvent.clientY ? moveEvent.clientY - rect.top : moveEvent.touches[0].clientY - rect.top;
+    const currentX = (moveEvent.clientX ? moveEvent.clientX - rect.left : moveEvent.touches[0].clientX - rect.left) / scale;
+    const currentY = (moveEvent.clientY ? moveEvent.clientY - rect.top : moveEvent.touches[0].clientY - rect.top) / scale;
     const width = currentX - startX;
     const height = currentY - startY;
 
@@ -1044,7 +1166,6 @@ function startCreateBox(e) {
 
   // إنهاء السحب
   const onEnd = () => {
-    // تطبيق الخصائص الافتراضية على المربع
     newBox.addEventListener('click', () => {
       if (newBox.classList.toggle('selected')) {
         selectedBoxes.push({
@@ -1066,7 +1187,6 @@ function startCreateBox(e) {
     rectangles.push(newBox); // تخزين المربع الجديد
     saveHistory(); // حفظ الحالة الحالية
 
-    // إزالة أحداث السحب
     document.removeEventListener('mousemove', onMove);
     document.removeEventListener('mouseup', onEnd);
     document.removeEventListener('touchmove', onMove);
