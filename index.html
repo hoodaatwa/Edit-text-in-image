@@ -175,6 +175,12 @@
   height:0;
 }
 
+    /* إخفاء الزر في شاشة التليفون */
+@media (max-width: 668px) {
+  #toggleZoomBtn {
+    display: none !important;
+  }
+}
 
     .repoCard {
       background: #f7fafc;
@@ -617,16 +623,6 @@ document.getElementById('toggleEffectsPanel').addEventListener('click', function
 });
 
 
-
-
-
-
-
-
-
-
-
-
   let adjustZoomEnabled = true; // التحكم في حالة adjustZoom
 
   function adjustZoom() {
@@ -684,49 +680,6 @@ document.getElementById('toggleEffectsPanel').addEventListener('click', function
     // تحديث نص الزر
     this.querySelector("span").textContent = adjustZoomEnabled ? "Enable Zoom" : "Disable Zoom";
   });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 document.getElementById('toggleEffectsPanel').addEventListener('click', function() {
@@ -1004,12 +957,6 @@ function stopBrush() {
   stopButton.style.display = 'none';
   reuseBrushImageOnlyButton.style.display = brushImage ? 'block' : 'none';
 }
-
-
-
-
-
-
 
 
 
