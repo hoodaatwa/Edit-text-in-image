@@ -39,10 +39,10 @@
   height: calc(100vh - 75px);
   background: rgba(255, 255, 255, 0.9);
   border-radius: 10px;
-  padding: 2px;
+  padding: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
-  max-width: 370px;
+  max-width: 400px;
   display: none; /* إخفاء اللوحة بشكل افتراضي */
 }
 
@@ -134,7 +134,7 @@
     left: 6.2rem;
   }
   #effectsPanel {
-    max-width: 340px; /* توسيع اللوحة الجانبية */
+    max-width: 400px; /* توسيع اللوحة الجانبية */
   }
 }
 @media (min-width: 1025px) {
@@ -163,7 +163,7 @@
     font-size: 17px; /* نص أكبر */
   }
   #effectsPanel {
-    max-width: 380px; /* لوحة عريضة */
+    max-width: 600px; /* لوحة عريضة */
    left: 6.5rem;
   }
   #tab-edit.with-effects {
@@ -254,28 +254,18 @@
       
       <!-- Effects Panel -->
       <div id="effectsPanel" class="hidden">
-        
-         <div class="shadow border p-1" style="border: 1px solid #ccc; padding: 10px; margin: 10px;">
-<h4 class="font-semibold">Choose Brush Settings:</h4>
-<div id="colorPalette" class="shadow border space-y-2 p-2 mt-1" >
-  <label  class="block">Choose Brush</label>
-  <input type="color" id="colorPicker" class="w-16 h-16 cursor-pointer border-2 border-gray-300" />
-  
+        <h3 class="text-lg font-semibold mb-2">Panel</h3>
 
-  
+       
+<div id="colorPalette" class="space-y-2" style="border: 1px solid #ccc; padding: 10px; margin: 10px;">
+  <h4 class="font-semibold">Choose Brush Settings</h4>
+    <label class="block">Choose Brush</label>
+  <input type="color" id="colorPicker" class="w-16 h-16 cursor-pointer border-2 border-gray-300" />
+<hr class="w-full h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
   <div>
-    <label for="brushType" class="block">Brush Type</label>
-    <select id="brushType" class="w-full border-2 border-gray-300">
-      <option value="circle">Circle</option>
-      <option value="square">Square</option>
-    </select>
-  </div>
-  </div>
-<br>
-  <!-- Input لاختيار صورة الفرشاة -->
-  <div class="shadow border p-2 -my-1 mb-5">
     <label class="block">Choose Image Brush</label>
-    <input type="file" id="imageBrush" accept="image/*" class="block w-auto text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+    <input type="file" id="imageBrush" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+  </div>
   
   <!-- المكان الذي يتم فيه عرض الصورة لاقتصاصها -->
   <div id="crop-container" style="display:none;">
@@ -287,11 +277,12 @@
 <!-- إضافة زر جديد لإعادة استخدام الفرشاة بالصورة -->
 <button id="reuseBrushImageOnlyButton" style="display:none;" class="block w-full bg-blue-500 text-white px-4 py-2 rounded">USE Brush Image</button>
 
-  </div>
+<hr class="w-full h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10 dark:bg-gray-700">
+
 
   <div>
     <label for="brushSize" class="block">Brush Size</label>
-    <input type="range" id="brushSize" min="5" max="60" value="10" class="w-auto border-2 border-gray-300" />
+    <input type="range" id="brushSize" min="1" max="60" value="10" class="w-auto border-2 border-gray-300" />
     <span id="brushSizeValue" class="text-sm">60</span>
   </div>
   
@@ -300,6 +291,17 @@
     <input type="range" id="brushOpacity" min="0" max="1" step="0.1" value="1" class="w-auto border-2 border-gray-300" />
     <span id="brushOpacityValue" class="text-lg">1</span>
   </div>
+  
+  <div>
+    <label for="brushType" class="block">Brush Type</label>
+    <select id="brushType" class="w-full border-2 border-gray-300">
+      <option value="circle">Circle</option>
+      <option value="square">Square</option>
+    </select>
+  </div>
+
+  <!-- Input لاختيار صورة الفرشاة -->
+
 
 </div>
 
